@@ -113,7 +113,7 @@
 {"id": "u053", "question": "Did I pass my supplementary exam?", "answerable": false, "category": "personal"}
 {"id": "u054", "question": "How many library books do I currently have issued?", "answerable": false, "category": "personal"}
 {"id": "u055", "question": "What was my NET rank?", "answerable": false, "category": "personal"}
-{"id": "u056", "question": "Am I eligible for the merit scholarship?", "answerable": false, "category": "personal"}
+{"id": "u056", "question": "Has my scholarship been renewed for this semester?", "answerable": false, "category": "personal"}
 {"id": "u057", "question": "When is my next exam?", "answerable": false, "category": "personal"}
 {"id": "u058", "question": "What is my roll number?", "answerable": false, "category": "personal"}
 {"id": "u059", "question": "Have I been placed yet?", "answerable": false, "category": "personal"}
