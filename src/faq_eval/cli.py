@@ -56,9 +56,10 @@ def smoke(
     model: str = typer.Option("llama3.2:3b", help="Ollama model name."),
     prompt: str = typer.Option("strict", help="Prompt variant: lenient or strict."),
 ) -> None:
-    """Run a handful of questions (one per kind) and print the raw answers."""
+    """Run a handful of questions (one per kind) and print the answers with their grades."""
     from faq_eval.bot import BotConfig, FAQBot
     from faq_eval.dataset import load_questions
+    from faq_eval.grader import grade
 
     by_id = {q.id: q for q in load_questions()}
     bot = FAQBot(BotConfig(model=model, prompt=prompt))
@@ -68,7 +69,9 @@ def smoke(
         expected = q.required_facts or q.premise_corrections or "refusal"
         typer.echo(f"[{q.id} | {q.category.value} | {resp.latency_s:.1f}s] {q.question}")
         typer.echo(f"  expected: {expected}")
-        typer.echo(f"  answer:   {resp.answer}\n")
+        typer.echo(f"  answer:   {resp.answer}")
+        g = grade(q, resp.answer)
+        typer.echo(f"  grade:    {g.label.value} ({g.reason})\n")
 
 
 if __name__ == "__main__":
