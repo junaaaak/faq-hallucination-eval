@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+
+# Results cache (raw model outputs can be regenerated)
+results/cache/
+
+# Local notes
+PLAN.md
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
