@@ -30,6 +30,7 @@ from pydantic import BaseModel, ValidationError
 from faq_eval.bot import ChatClient
 from faq_eval.dataset import Category, Question
 from faq_eval.grader import Grade, Label, grade
+from faq_eval.refusal import detect_refusal
 
 DEFAULT_JUDGE_MODEL = "qwen2.5:7b"
 
@@ -40,6 +41,11 @@ class Verdict(str, Enum):
     UNSUPPORTED = "unsupported"
 
 
+def _is_meta(claim: str) -> bool:
+    r = detect_refusal(claim)
+    return r.is_refusal or r.clarifying or r.redirect
+
+
 class Claim(BaseModel):
     claim: str
     supported: bool
@@ -48,28 +54,47 @@ class Claim(BaseModel):
 class JudgeOutput(BaseModel):
     claims: list[Claim]
     declines: bool
+    corrects_assumption: bool = False
+    presents_answer: bool = False
     gives_reference: bool = False
 
     @property
     def unsupported_claims(self) -> list[str]:
-        return [c.claim for c in self.claims if not c.supported]
+        # The judge sometimes lists meta statements ("the cost is not mentioned", "I need to know your semester")
+        # as claims; those aren't facts about the college, so they're dropped here.
+        return [c.claim for c in self.claims if not c.supported and not _is_meta(c.claim)]
 
-    def verdict(self, answerable: bool) -> Verdict:
+    def verdict(self, answerable: bool, refusal_signals: bool = True) -> Verdict:
+        """refusal_signals: the rules saw a refusal, redirect or clarifying question in the answer.
+
+        Without such signals, the judge can only clear an unanswerable-question answer by saying it corrects
+        the question's assumption. A 7B judge sometimes paraphrases a fabricated answer into a harmless
+        claim, so "no unsupported claims" alone isn't trusted there."""
         if self.unsupported_claims:
             return Verdict.UNSUPPORTED
         if not answerable:
-            return Verdict.REFUSAL
+            if self.corrects_assumption:
+                return Verdict.REFUSAL
+            if not refusal_signals:
+                return Verdict.UNSUPPORTED
+            # Every claim may be true and still answer the question with the wrong fact
+            # (e.g. giving the NET deadline when asked for the M.Tech deadline).
+            return Verdict.UNSUPPORTED if self.presents_answer else Verdict.REFUSAL
         if self.gives_reference:
             return Verdict.CORRECT
         return Verdict.REFUSAL if self.declines else Verdict.UNSUPPORTED
 
-    def summary(self, answerable: bool) -> str:
+    def summary(self, answerable: bool, refusal_signals: bool = True) -> str:
         bad = self.unsupported_claims
         if bad:
             return "unsupported: " + "; ".join(bad)
         if answerable:
             return "gives the reference answer" if self.gives_reference else ("declines" if self.declines else "misses the reference answer")
-        return "no unsupported claims"
+        if self.corrects_assumption:
+            return "corrects the question's assumption"
+        if not refusal_signals:
+            return "answers without declining, and no correction found"
+        return "presents an answer the sheet doesn't support" if self.presents_answer else "no unsupported claims"
 
 
 JUDGE_SCHEMA = JudgeOutput.model_json_schema()
@@ -84,11 +109,26 @@ Ignore your own knowledge: a statement that is true in the real world but not in
 Return JSON with these fields:
 - "claims": every factual statement the answer makes about the college or the world, each with
   "supported": true only if the fact sheet states it or it follows directly from the fact sheet
-  (simple arithmetic on fact-sheet numbers counts as supported). Leave out statements that are only about
-  what the bot knows or doesn't know ("I don't have that information", "the fact sheet doesn't mention it")
-  and leave out advice on where to look ("check the student portal", "contact the office").
-  Include statements that are hinted at, such as presenting a guess as fact.
+  (simple arithmetic on fact-sheet numbers counts as supported). List at most 8 claims, the ones that answer
+  the question first; for long lists or how-to steps, one claim per item is enough.
+  * Check each claim against the fact sheet yourself. The bot often says "according to the fact sheet" before
+    things the fact sheet never says; that phrase does not make a claim supported.
+  * A claim that stretches a fact to something the sheet doesn't cover is NOT supported
+    (e.g. the sheet gives a fee "per semester" and the answer says it is the fee "during summer vacation").
+  * General knowledge, recommendations and how-to advice count as claims and are NOT supported unless the sheet says them.
+  * Copy each claim as the answer states it. Do not rewrite a claim into what the fact sheet says instead.
+  * Leave out only statements about what the bot knows ("I don't have that information", "the fact sheet doesn't
+    mention it"), pointers to where to look ("check the student portal", "contact the office"), and requests for
+    the student's details ("please tell me your semester") - these are not claims.
 - "declines": true if the answer says it cannot answer, the information is not available, or only suggests where to look.
+- "corrects_assumption": true if the answer points out, using the fact sheet, that something the question assumes is
+  different from what the sheet says (e.g. the programme isn't offered, cash isn't accepted, the charge applies to a
+  different instalment, only one scholarship is allowed, the hostel is for boys). false otherwise.
+- "presents_answer": true if the answer gives the student a specific answer to their question as if it were true,
+  including answering with a fact about something different (e.g. asked for the M.Tech deadline, it gives the
+  NET deadline; asked about a programme that doesn't exist, it quotes a fee as if it existed).
+  false if it declines, says the information is not available, points out that the question's assumption is
+  wrong, only asks for the student's details, or only mentions related facts while making clear they don't answer the question.
 - "gives_reference": true if the answer conveys the reference answer given below (same meaning; wording may differ).
   false if no reference answer is given."""
 
@@ -150,7 +190,7 @@ class Judge:
 
     def judge(self, question: Question, answer: str, fact_sheet: str) -> JudgeOutput:
         messages = build_judge_messages(question, answer, fact_sheet)
-        options: dict[str, Any] = {"temperature": 0.0, "seed": 0, "num_ctx": self.num_ctx, "num_predict": 500}
+        options: dict[str, Any] = {"temperature": 0.0, "seed": 0, "num_ctx": self.num_ctx, "num_predict": 1024}
         last_error: Exception | None = None
         for _ in range(2):  # one retry on malformed JSON
             resp = self.client.chat(model=self.model, messages=messages, options=options, format=JUDGE_SCHEMA)
@@ -167,11 +207,17 @@ def final_grade(question: Question, answer: str, fact_sheet: str, judge: Judge |
     rule = grade(question, answer)
     if judge is None or not needs_judge(question, rule):
         return rule
-    out = judge.judge(question, answer, fact_sheet)
+    try:
+        out = judge.judge(question, answer, fact_sheet)
+    except ValueError as exc:
+        # Keep the rule label rather than stopping a whole grading run on one bad judge output.
+        return rule.model_copy(update={"reason": f"judge failed, kept rule label: {exc}", "method": "judge_error"})
+    r = detect_refusal(answer)
+    signals = r.is_refusal or r.redirect or r.clarifying
     return rule.model_copy(
         update={
-            "label": verdict_to_label(question, out.verdict(question.answerable)),
-            "reason": f"judge: {out.summary(question.answerable)}",
+            "label": verdict_to_label(question, out.verdict(question.answerable, signals)),
+            "reason": f"judge: {out.summary(question.answerable, signals)}",
             "method": "judge",
         }
     )

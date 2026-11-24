@@ -52,6 +52,7 @@ _MULTIPLIERS = {"lakh": 1e5, "lakhs": 1e5, "lac": 1e5, "lacs": 1e5, "lpa": 1e5, 
 def normalise(text: str) -> str:
     text = unicodedata.normalize("NFKC", text)
     text = text.replace("’", "'").replace("‘", "'").replace("–", "-").replace("—", "-")
+    text = re.sub(r"[*_`#]+", "", text)  # markdown emphasis, e.g. "is **not specified**"
     return re.sub(r"\s+", " ", text).strip().lower()
 
 

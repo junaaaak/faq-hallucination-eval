@@ -103,6 +103,7 @@ def grade_cmd(
     name: str = typer.Option(..., help="Run name to grade."),
     judge_model: str = typer.Option("qwen2.5:7b", help="Ollama model for the judge."),
     no_judge: bool = typer.Option(False, "--no-judge", help="Rules only; leave undecided answers as uncertain."),
+    rejudge: bool = typer.Option(False, "--rejudge", help="Ignore saved judge verdicts (after changing the judge)."),
 ) -> None:
     """Grade a run with the rules, then the LLM judge for answers the rules can't decide."""
     from collections import Counter
@@ -116,7 +117,7 @@ def grade_cmd(
         if g.method == "judge":
             typer.echo(f"  judged {g.question_id} ({g.prompt}): {g.rule_label.value} -> {g.label.value}")
 
-    path = grade_run(name, judge=judge, on_progress=progress)
+    path = grade_run(name, judge=judge, on_progress=progress, rejudge=rejudge)
     graded = load_graded(name)
     for key in sorted({(g.model, g.prompt, g.temperature) for g in graded}):
         counts = Counter(g.label.value for g in graded if (g.model, g.prompt, g.temperature) == key)

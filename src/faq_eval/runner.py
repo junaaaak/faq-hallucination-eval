@@ -116,8 +116,9 @@ def grade_run(
     name: str,
     judge: Judge | None = None,
     on_progress: Callable[[int, int, GradedRecord], None] | None = None,
+    rejudge: bool = False,
 ) -> Path:
-    """Grade every answer in a run, reusing earlier judge verdicts for unchanged answers."""
+    """Grade every answer in a run, reusing earlier judge verdicts for unchanged answers unless rejudge is set."""
     questions = {q.id: q for q in load_questions()}
     fact_sheet = load_fact_sheet()
     records: list[RunRecord] = read_jsonl(run_path(name), RunRecord)
@@ -130,7 +131,7 @@ def grade_run(
     graded: list[GradedRecord] = []
     for i, rec in enumerate(records, start=1):
         q = questions[rec.question_id]
-        cached = previous.get((rec.key(), rec.answer)) if judge else None
+        cached = previous.get((rec.key(), rec.answer)) if judge and not rejudge else None
         if cached:
             g = cached
         else:

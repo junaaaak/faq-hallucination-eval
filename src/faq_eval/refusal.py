@@ -45,7 +45,10 @@ _REDIRECT_RE = re.compile(
     rf"(?:please|you can|you could|you should|try to)) (?:\w+ ){{0,2}}?(?:{_REDIRECT_VERB})\b"
 )
 # Asking the student for details, which implies an answer exists if they reply.
-_CLARIFY_RE = re.compile(r"\b(?:could|can|would) you (?:please )?(?:tell|share|provide|let me know|confirm|specify)\b")
+_CLARIFY_RE = re.compile(
+    r"\b(?:(?:could|can|would) you (?:please )?(?:tell|share|provide|let me know|confirm|specify)"
+    r"|please (?:provide|share|tell)|i (?:would )?need (?:to know|more|some|your)|i'll need (?:to know|more|some|your))\b"
+)
 
 
 @dataclass(frozen=True)
@@ -66,7 +69,7 @@ def detect_refusal(answer: str) -> RefusalResult:
         return RefusalResult(is_refusal=True, exact=True, pattern="exact")
 
     redirect = bool(_REDIRECT_RE.search(text))
-    clarifying = "?" in text and bool(_CLARIFY_RE.search(text))
+    clarifying = bool(_CLARIFY_RE.search(text))
 
     first = None
     for pattern in _REFUSAL_RE:

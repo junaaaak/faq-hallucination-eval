@@ -35,10 +35,11 @@ class FakeJudgeClient:
         return {"message": {"content": self.contents.pop(0)}}
 
 
-def judge_json(claims=(), declines=False, gives_reference=False) -> str:
+def judge_json(claims=(), declines=False, corrects_assumption=False, gives_reference=False) -> str:
     return json.dumps({
         "claims": [{"claim": c, "supported": s} for c, s in claims],
         "declines": declines,
+        "corrects_assumption": corrects_assumption,
         "gives_reference": gives_reference,
     })
 
@@ -66,6 +67,24 @@ def test_verdict_from_fields(answerable, out, verdict):
     assert out.verdict(answerable) == verdict
 
 
+def test_unanswerable_without_refusal_signals_needs_a_correction():
+    plain = JudgeOutput(claims=[Claim(claim="x", supported=True)], declines=True)
+    corrected = JudgeOutput(claims=[Claim(claim="x", supported=True)], declines=False, corrects_assumption=True)
+    assert plain.verdict(False, refusal_signals=False) == Verdict.UNSUPPORTED
+    assert corrected.verdict(False, refusal_signals=False) == Verdict.REFUSAL
+
+
+def test_meta_claims_are_ignored():
+    out = JudgeOutput(
+        claims=[
+            Claim(claim="The cost of the swimming pool is **not mentioned**.", supported=False),
+            Claim(claim="I need to know which semester you are in.", supported=False),
+        ],
+        declines=True,
+    )
+    assert out.unsupported_claims == []
+
+
 @pytest.mark.parametrize(
     "qid, verdict, label",
     [
@@ -88,7 +107,9 @@ def test_only_unsure_or_hallucination_go_to_judge():
 
 
 def test_final_grade_uses_judge_and_retries_bad_json():
-    client = FakeJudgeClient(["not json", judge_json(claims=[("only the second instalment has a late charge", True)])])
+    client = FakeJudgeClient(
+        ["not json", judge_json(claims=[("only the second instalment has a late charge", True)], corrects_assumption=True)]
+    )
     g = final_grade(Q["u014"], "Only the second instalment has a late charge.", SHEET, Judge(model="j", client=client))
     assert g.label == Label.CORRECT_REFUSAL
     assert g.method == "judge"
@@ -99,6 +120,13 @@ def test_judge_gives_up_after_retry():
     client = FakeJudgeClient(["{}", "{}"])
     with pytest.raises(ValueError):
         Judge(model="j", client=client).judge(Q["u014"], "x", SHEET)
+
+
+def test_final_grade_keeps_rule_label_when_judge_fails():
+    client = FakeJudgeClient(["{", "{"])
+    g = final_grade(Q["u001"], "Argentina won.", SHEET, Judge(model="j", client=client))
+    assert g.label == Label.HALLUCINATION
+    assert g.method == "judge_error"
 
 
 class FakeBot:
