@@ -1,0 +1,120 @@
+{"id": "a001", "question": "What time does the library close on weekdays?", "answerable": true, "category": "direct", "required_facts": [["9:00 PM", "9 PM", "21:00"]]}
+{"id": "a002", "question": "When was Northbridge Institute of Technology founded?", "answerable": true, "category": "direct", "required_facts": [["1998"]]}
+{"id": "a003", "question": "Who is the director of the institute?", "answerable": true, "category": "direct", "required_facts": [["Meera Kulkarni"]]}
+{"id": "a004", "question": "What is the B.Tech tuition fee per semester?", "answerable": true, "category": "direct", "required_facts": [["1,20,000", "120,000", "120000", "1.2 lakh"]]}
+{"id": "a005", "question": "What is the hostel curfew time?", "answerable": true, "category": "direct", "required_facts": [["10:30 PM", "22:30"]]}
+{"id": "a006", "question": "How many books can an undergraduate student borrow from the library at a time?", "answerable": true, "category": "direct", "required_facts": [["4", "four"]]}
+{"id": "a007", "question": "What is the fine for returning a library book late?", "answerable": true, "category": "direct", "required_facts": [["₹5", "Rs 5", "Rs. 5", "INR 5", "5 rupees"]]}
+{"id": "a008", "question": "What is the minimum attendance required to write the end-semester exams?", "answerable": true, "category": "direct", "required_facts": [["75%", "75 percent", "75 per cent"]]}
+{"id": "a009", "question": "When is the TechNova festival held?", "answerable": true, "category": "direct", "required_facts": [["February"]]}
+{"id": "a010", "question": "What is the application fee for the Northbridge Entrance Test?", "answerable": true, "category": "direct", "required_facts": [["1,500", "1500"]]}
+{"id": "a011", "question": "How many students are enrolled at the institute?", "answerable": true, "category": "direct", "required_facts": [["4,200", "4200"]]}
+{"id": "a012", "question": "What is the mess fee per semester?", "answerable": true, "category": "direct", "required_facts": [["22,000", "22000"]]}
+{"id": "a013", "question": "What is the email address of the examination cell?", "answerable": true, "category": "direct", "required_facts": [["exams@northbridge.example.edu"]]}
+{"id": "a014", "question": "What was the median placement package in 2025-26?", "answerable": true, "category": "direct", "required_facts": [["7.2 lakh", "7.2 LPA", "7,20,000", "720,000", "720000"]]}
+{"id": "a015", "question": "How big is the campus?", "answerable": true, "category": "direct", "required_facts": [["42 acres"]]}
+{"id": "a016", "question": "What is the minimum CGPA required to graduate?", "answerable": true, "category": "direct", "required_facts": [["5.0"]]}
+{"id": "a017", "question": "When does the 2026-27 academic year start?", "answerable": true, "category": "direct", "required_facts": [["4 August 2026", "August 4, 2026", "4th August 2026", "August 4 2026"]]}
+{"id": "a018", "question": "What is the Anti-Ragging Committee helpline number?", "answerable": true, "category": "direct", "required_facts": [["1800-200-4455", "18002004455", "1800 200 4455"]]}
+{"id": "a019", "question": "How many seats are there in B.Tech CSE each year?", "answerable": true, "category": "direct", "required_facts": [["180"]]}
+{"id": "a020", "question": "Who heads the Training and Placement Cell?", "answerable": true, "category": "direct", "required_facts": [["Arjun Rao"]]}
+{"id": "a021", "question": "What are the swimming pool timings?", "answerable": true, "category": "direct", "required_facts": [["6:00 AM", "6 AM"], ["8:00 AM", "8 AM"], ["5:00 PM", "5 PM"], ["7:00 PM", "7 PM"]]}
+{"id": "a022", "question": "How much does the college bus pass cost?", "answerable": true, "category": "direct", "required_facts": [["9,000", "9000"]]}
+{"id": "a023", "question": "How much is the refundable caution deposit?", "answerable": true, "category": "direct", "required_facts": [["10,000", "10000"]]}
+{"id": "a024", "question": "How many registered student clubs are there?", "answerable": true, "category": "direct", "required_facts": [["24"]]}
+{"id": "a025", "question": "Which exam score is needed for M.Tech admission?", "answerable": true, "category": "direct", "required_facts": [["GATE"]]}
+{"id": "a026", "question": "Till what time can I sit in the library on a Saturday?", "answerable": true, "category": "paraphrased", "required_facts": [["5:00 PM", "5 PM", "17:00"]]}
+{"id": "a027", "question": "Can I go to the library on Sunday?", "answerable": true, "category": "paraphrased", "required_facts": [["closed", "not open"]]}
+{"id": "a028", "question": "If I live in the hostel, do I have to pay for the mess?", "answerable": true, "category": "paraphrased", "required_facts": [["compulsory", "mandatory", "required"]]}
+{"id": "a029", "question": "Can I pay my fees in cash at the accounts office?", "answerable": true, "category": "paraphrased", "required_facts": [["student portal", "not accepted", "cannot", "can't"]]}
+{"id": "a030", "question": "What happens if I don't clear a subject?", "answerable": true, "category": "paraphrased", "required_facts": [["supplementary"]]}
+{"id": "a031", "question": "What marks do I need in PCM in 12th to apply for B.Tech?", "answerable": true, "category": "paraphrased", "required_facts": [["60%", "60 percent", "60 per cent"]]}
+{"id": "a032", "question": "How long can a PG student keep a library book?", "answerable": true, "category": "paraphrased", "required_facts": [["30 days"]]}
+{"id": "a033", "question": "When do placements kick off for final-year students?", "answerable": true, "category": "paraphrased", "required_facts": [["August"]]}
+{"id": "a034", "question": "Is a doctor available at the medical centre all day?", "answerable": true, "category": "paraphrased", "required_facts": [["9:00 AM", "9 AM"], ["6:00 PM", "6 PM"]]}
+{"id": "a035", "question": "What CGPA do I need to keep my scholarship?", "answerable": true, "category": "paraphrased", "required_facts": [["7.5"]]}
+{"id": "a036", "question": "Will I definitely get a hostel room as a fresher?", "answerable": true, "category": "paraphrased", "required_facts": [["guaranteed"]]}
+{"id": "a037", "question": "Which hostel do girls stay in?", "answerable": true, "category": "paraphrased", "required_facts": [["Kaveri"]]}
+{"id": "a038", "question": "How do I get to campus from Rivermoor Central station?", "answerable": true, "category": "paraphrased", "required_facts": [["bus"]]}
+{"id": "a039", "question": "Where can I withdraw cash on campus?", "answerable": true, "category": "paraphrased", "required_facts": [["ATM"]]}
+{"id": "a040", "question": "When is the cultural fest?", "answerable": true, "category": "paraphrased", "required_facts": [["October"]]}
+{"id": "a041", "question": "Does the Maths and Humanities department give its own degree?", "answerable": true, "category": "paraphrased", "required_facts": [["does not", "doesn't", "not offer", "no degree", "no own degree"]]}
+{"id": "a042", "question": "How many people share a hostel room?", "answerable": true, "category": "paraphrased", "required_facts": [["two", "2"]]}
+{"id": "a043", "question": "How soon after exams do end-sem results come out?", "answerable": true, "category": "paraphrased", "required_facts": [["30 days"]]}
+{"id": "a044", "question": "What's the last date to apply for NET 2027?", "answerable": true, "category": "paraphrased", "required_facts": [["15 March 2027", "March 15, 2027", "15th March 2027", "March 15 2027"]]}
+{"id": "a045", "question": "What CGPA do I need to sit for placements?", "answerable": true, "category": "paraphrased", "required_facts": [["6.0"]]}
+{"id": "a046", "question": "What is the total tuition fee for the full 4-year B.Tech?", "answerable": true, "category": "multi_fact", "required_facts": [["9,60,000", "960,000", "960000", "9.6 lakh"]]}
+{"id": "a047", "question": "What are hostel and mess fees together per semester?", "answerable": true, "category": "multi_fact", "required_facts": [["67,000", "67000"]]}
+{"id": "a048", "question": "How much does a new B.Tech hosteller pay in the first semester, including the admission fee, tuition, hostel, mess and caution deposit?", "answerable": true, "category": "multi_fact", "required_facts": [["2,22,000", "222,000", "222000", "2.22 lakh"]]}
+{"id": "a049", "question": "How many B.Tech seats are there in total each year?", "answerable": true, "category": "multi_fact", "required_facts": [["420"]]}
+{"id": "a050", "question": "With the merit scholarship, how much B.Tech tuition do I pay per semester?", "answerable": true, "category": "multi_fact", "required_facts": [["60,000", "60000"]]}
+{"id": "a051", "question": "How many hostel beds are there in total?", "answerable": true, "category": "multi_fact", "required_facts": [["1,550", "1550"]]}
+{"id": "a052", "question": "How many beds are there across the boys' hostels?", "answerable": true, "category": "multi_fact", "required_facts": [["1,100", "1100"]]}
+{"id": "a053", "question": "How many hours is the library open on a weekday?", "answerable": true, "category": "multi_fact", "required_facts": [["13"]]}
+{"id": "a054", "question": "If I return 2 books 3 days late, how much fine will I pay?", "answerable": true, "category": "multi_fact", "required_facts": [["30"]]}
+{"id": "a055", "question": "How many lateral entry seats are there in B.Tech CSE?", "answerable": true, "category": "multi_fact", "required_facts": [["18"]]}
+{"id": "a056", "question": "How many M.Tech seats are there in total each year?", "answerable": true, "category": "multi_fact", "required_facts": [["60"]]}
+{"id": "a057", "question": "How many years old is the institute in 2026?", "answerable": true, "category": "multi_fact", "required_facts": [["28"]]}
+{"id": "a058", "question": "If I fail 2 courses, how much will the supplementary exams cost me?", "answerable": true, "category": "multi_fact", "required_facts": [["2,000", "2000"]]}
+{"id": "a059", "question": "Can a student get both the merit and the need-based scholarship?", "answerable": true, "category": "multi_fact", "required_facts": [["only one", "cannot", "can't", "not both"]]}
+{"id": "a060", "question": "With the need-based scholarship, how much B.Tech tuition do I pay per semester?", "answerable": true, "category": "multi_fact", "required_facts": [["90,000", "90000"]]}
+{"id": "u001", "question": "Who won the 2022 FIFA World Cup?", "answerable": false, "category": "out_of_scope"}
+{"id": "u002", "question": "What is the capital of Australia?", "answerable": false, "category": "out_of_scope"}
+{"id": "u003", "question": "What is the current repo rate set by the Reserve Bank of India?", "answerable": false, "category": "out_of_scope"}
+{"id": "u004", "question": "Which is the best engineering college in India?", "answerable": false, "category": "out_of_scope"}
+{"id": "u005", "question": "What will the weather be like in Rivermoor tomorrow?", "answerable": false, "category": "out_of_scope"}
+{"id": "u006", "question": "How does Northbridge rank compared to IIT Bombay?", "answerable": false, "category": "out_of_scope"}
+{"id": "u007", "question": "Which laptop should I buy for engineering?", "answerable": false, "category": "out_of_scope"}
+{"id": "u008", "question": "Who is the Prime Minister of India?", "answerable": false, "category": "out_of_scope"}
+{"id": "u009", "question": "What is the GATE syllabus for computer science?", "answerable": false, "category": "out_of_scope"}
+{"id": "u010", "question": "What is the JEE Main cutoff this year?", "answerable": false, "category": "out_of_scope"}
+{"id": "u011", "question": "What's the best restaurant near Rivermoor Central station?", "answerable": false, "category": "out_of_scope"}
+{"id": "u012", "question": "What is the population of Rivermoor?", "answerable": false, "category": "out_of_scope"}
+{"id": "u013", "question": "What are the library hours during exam week?", "answerable": false, "category": "near_miss"}
+{"id": "u014", "question": "What is the late charge for paying the first fee instalment late?", "answerable": false, "category": "near_miss"}
+{"id": "u015", "question": "What was the median placement package for M.Tech CSE students?", "answerable": false, "category": "near_miss"}
+{"id": "u016", "question": "What was the highest package for ECE students in 2025-26?", "answerable": false, "category": "near_miss"}
+{"id": "u017", "question": "What is on the mess menu on Mondays?", "answerable": false, "category": "near_miss"}
+{"id": "u018", "question": "How much is the hostel fee during the summer vacation?", "answerable": false, "category": "near_miss"}
+{"id": "u019", "question": "What is the email address of the placement cell?", "answerable": false, "category": "near_miss"}
+{"id": "u020", "question": "What is the phone number of the hostel office?", "answerable": false, "category": "near_miss"}
+{"id": "u021", "question": "Who is the head of the CSE department?", "answerable": false, "category": "near_miss"}
+{"id": "u022", "question": "How many faculty members does the ECE department have?", "answerable": false, "category": "near_miss"}
+{"id": "u023", "question": "What are the college bus timings?", "answerable": false, "category": "near_miss"}
+{"id": "u024", "question": "On what exact date in May 2027 is the NET exam?", "answerable": false, "category": "near_miss"}
+{"id": "u025", "question": "What is the syllabus for the Northbridge Entrance Test?", "answerable": false, "category": "near_miss"}
+{"id": "u026", "question": "What is the application deadline for M.Tech admission?", "answerable": false, "category": "near_miss"}
+{"id": "u027", "question": "Is the NET application fee waived for SC/ST candidates?", "answerable": false, "category": "near_miss"}
+{"id": "u028", "question": "What is the minimum GATE score needed for M.Tech admission?", "answerable": false, "category": "near_miss"}
+{"id": "u029", "question": "On what date are the supplementary exams in June 2027?", "answerable": false, "category": "near_miss"}
+{"id": "u030", "question": "How much does a consultation at the medical centre cost?", "answerable": false, "category": "near_miss"}
+{"id": "u031", "question": "Which companies came for placements in 2025-26?", "answerable": false, "category": "near_miss"}
+{"id": "u032", "question": "How many books can faculty members borrow from the library?", "answerable": false, "category": "near_miss"}
+{"id": "u033", "question": "How much does it cost to use the swimming pool?", "answerable": false, "category": "near_miss"}
+{"id": "u034", "question": "Is there a dress code on campus?", "answerable": false, "category": "near_miss"}
+{"id": "u035", "question": "How many members does the robotics club have?", "answerable": false, "category": "near_miss"}
+{"id": "u036", "question": "Will I get my tuition fee back if I withdraw admission in the first month?", "answerable": false, "category": "near_miss"}
+{"id": "u037", "question": "What is the hostel fee for an AC room?", "answerable": false, "category": "false_premise", "premise_corrections": ["non-AC", "no AC", "not AC", "don't have AC", "do not have AC"]}
+{"id": "u038", "question": "When do admissions open for the medical school?", "answerable": false, "category": "false_premise", "premise_corrections": ["no medical school", "does not have a medical", "doesn't have a medical", "five departments", "engineering college"]}
+{"id": "u039", "question": "What is the M.Tech fee for Mechanical Engineering?", "answerable": false, "category": "false_premise", "premise_corrections": ["only in CSE and ECE", "only CSE and ECE", "not offered", "not offer", "isn't offered", "is not offered"]}
+{"id": "u040", "question": "How much does a single-occupancy hostel room cost?", "answerable": false, "category": "false_premise", "premise_corrections": ["shared by two", "twin sharing", "two students", "no single"]}
+{"id": "u041", "question": "What time does the library open on Sundays?", "answerable": false, "category": "false_premise", "premise_corrections": ["closed"]}
+{"id": "u042", "question": "Where do I pay my fees in cash?", "answerable": false, "category": "false_premise", "premise_corrections": ["not accepted", "cash is not", "only through the student portal", "cannot pay in cash", "can't pay in cash"]}
+{"id": "u043", "question": "How much is the PhD stipend at Northbridge?", "answerable": false, "category": "false_premise", "premise_corrections": ["no PhD", "does not offer a PhD", "doesn't offer a PhD", "not offer PhD", "only B.Tech and M.Tech"]}
+{"id": "u044", "question": "When is the institute's own M.Tech entrance test held?", "answerable": false, "category": "false_premise", "premise_corrections": ["no separate", "no institute test", "GATE"]}
+{"id": "u045", "question": "What is the admission cutoff for the B.Tech in Mathematics and Humanities?", "answerable": false, "category": "false_premise", "premise_corrections": ["does not offer its own degree", "doesn't offer its own degree", "no degree", "not offer a degree", "not offer a B.Tech"]}
+{"id": "u046", "question": "What is the fee for Aravali, the girls' hostel?", "answerable": false, "category": "false_premise", "premise_corrections": ["boys", "Kaveri"]}
+{"id": "u047", "question": "How do I apply for both the merit and need-based scholarships together?", "answerable": false, "category": "false_premise", "premise_corrections": ["only one"]}
+{"id": "u048", "question": "What events happen at TechNova in October?", "answerable": false, "category": "false_premise", "premise_corrections": ["February"]}
+{"id": "u049", "question": "What is my current attendance percentage?", "answerable": false, "category": "personal"}
+{"id": "u050", "question": "What was my CGPA last semester?", "answerable": false, "category": "personal"}
+{"id": "u051", "question": "Has my fee payment been received?", "answerable": false, "category": "personal"}
+{"id": "u052", "question": "Which hostel room have I been allotted?", "answerable": false, "category": "personal"}
+{"id": "u053", "question": "Did I pass my supplementary exam?", "answerable": false, "category": "personal"}
+{"id": "u054", "question": "How many library books do I currently have issued?", "answerable": false, "category": "personal"}
+{"id": "u055", "question": "What was my NET rank?", "answerable": false, "category": "personal"}
+{"id": "u056", "question": "Am I eligible for the merit scholarship?", "answerable": false, "category": "personal"}
+{"id": "u057", "question": "When is my next exam?", "answerable": false, "category": "personal"}
+{"id": "u058", "question": "What is my roll number?", "answerable": false, "category": "personal"}
+{"id": "u059", "question": "Have I been placed yet?", "answerable": false, "category": "personal"}
+{"id": "u060", "question": "How much library fine do I owe right now?", "answerable": false, "category": "personal"}

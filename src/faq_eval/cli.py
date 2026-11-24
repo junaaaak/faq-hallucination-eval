@@ -18,5 +18,19 @@ def version() -> None:
     typer.echo(__version__)
 
 
+@app.command("validate-data")
+def validate_data() -> None:
+    """Load and validate the fact sheet and question set, then print counts."""
+    from faq_eval.dataset import load_fact_sheet, load_questions, summarise
+
+    sheet = load_fact_sheet()
+    questions = load_questions()
+    answerable = sum(q.answerable for q in questions)
+    typer.echo(f"fact sheet: {len(sheet.split())} words")
+    typer.echo(f"questions: {len(questions)} ({answerable} answerable, {len(questions) - answerable} unanswerable)")
+    for category, n in summarise(questions).items():
+        typer.echo(f"  {category:<14} {n}")
+
+
 if __name__ == "__main__":
     app()
