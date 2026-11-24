@@ -18,7 +18,7 @@ DEFAULT_MAX_TOKENS = 256
 
 
 class ChatClient(Protocol):
-    def chat(self, *, model: str, messages: list[dict[str, str]], options: dict[str, Any]) -> Any: ...
+    def chat(self, *, model: str, messages: list[dict[str, str]], options: dict[str, Any], **kwargs: Any) -> Any: ...
 
 
 class BotConfig(BaseModel):
