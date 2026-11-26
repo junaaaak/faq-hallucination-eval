@@ -164,5 +164,21 @@ def agreement_cmd(
             )
 
 
+
+@app.command("report")
+def report_cmd(name: str = typer.Option(..., help="Graded run to report on.")) -> None:
+    """Write results/reports/<name>.md with tables, confidence intervals and plots."""
+    from faq_eval.metrics import setting_metrics
+    from faq_eval.report import build_report
+    from faq_eval.runner import load_graded
+
+    path = build_report(name)
+    for m in setting_metrics(load_graded(name)):
+        typer.echo(
+            f"{m.model:<14} {m.prompt:<8} t={m.temperature:<4g} acc {m.accuracy.fmt()}  "
+            f"halluc {m.hallucination.fmt()}  balanced {m.balanced:.0%}"
+        )
+    typer.echo(f"report: {path}")
+
 if __name__ == "__main__":
     app()

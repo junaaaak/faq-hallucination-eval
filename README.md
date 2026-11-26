@@ -35,6 +35,16 @@ tests/           unit tests
 results/         run outputs, reports, plots
 ```
 
+## Results
+
+The main run (3 models × 2 prompts × 120 questions, temperature 0) is written up in
+[results/reports/main.md](results/reports/main.md), with Wilson 95% intervals and plots.
+Regenerate it with:
+
+```bash
+faq-eval report --name main
+```
+
 ## Status
 
-Work in progress.
+Work in progress: temperature sweep and Streamlit demo still to come.
