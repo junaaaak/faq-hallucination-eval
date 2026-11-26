@@ -86,3 +86,41 @@ def test_build_report_writes_markdown_and_plots(tmp_path, monkeypatch):
     assert "Strict vs lenient" in text and "Example hallucinations" in text
     assert (tmp_path / "reports" / "t" / "tradeoff.png").stat().st_size > 0
     assert (tmp_path / "reports" / "t" / "categories.png").stat().st_size > 0
+
+
+def test_consistency_metrics():
+    rs = [
+        rec("m", "lenient", "u1", False, Label.HALLUCINATION, "near_miss", sample=0, temperature=1.0),
+        rec("m", "lenient", "u1", False, Label.CORRECT_REFUSAL, "near_miss", sample=1, temperature=1.0),
+        rec("m", "lenient", "u2", False, Label.CORRECT_REFUSAL, "near_miss", sample=0, temperature=1.0),
+        rec("m", "lenient", "u2", False, Label.CORRECT_REFUSAL, "near_miss", sample=1, temperature=1.0),
+        rec("m", "lenient", "a1", True, Label.CORRECT, sample=0, temperature=1.0),
+        rec("m", "lenient", "a1", True, Label.WRONG, sample=1, temperature=1.0),
+        rec("m", "lenient", "a1", True, Label.CORRECT, temperature=0.0),  # one sample: skipped
+    ]
+    from faq_eval.metrics import consistency_metrics
+
+    (c,) = consistency_metrics(rs)
+    assert c.temperature == 1.0 and c.samples == 2
+    assert (c.consistent.k, c.consistent.n) == (1, 3)
+    assert (c.any_hallucination.k, c.any_hallucination.n) == (1, 2)
+    assert (c.any_error_answerable.k, c.any_error_answerable.n) == (1, 1)
+
+
+def test_build_report_with_temperatures(tmp_path, monkeypatch):
+    from faq_eval import labels, report, runner
+
+    monkeypatch.setattr(runner, "GRADED_DIR", tmp_path / "graded")
+    monkeypatch.setattr(report, "REPORTS_DIR", tmp_path / "reports")
+    monkeypatch.setattr(labels, "LABELS_DIR", tmp_path / "labels")
+    runner.GRADED_DIR.mkdir()
+    hot = [r.model_copy(update={"temperature": 1.0, "sample": s}) for r in RECORDS for s in range(3)]
+    with (runner.GRADED_DIR / "t.jsonl").open("w", encoding="utf-8") as f:
+        for r in RECORDS + hot:
+            f.write(r.model_dump_json() + "\n")
+
+    text = report.build_report("t").read_text(encoding="utf-8")
+    assert "## Headline (temperature 0)" in text and "## Temperature" in text
+    assert "| t=0 | t=1 |" in text
+    assert "hallucinated in at least one sample" in text
+    assert (tmp_path / "reports" / "t" / "temperature.png").stat().st_size > 0

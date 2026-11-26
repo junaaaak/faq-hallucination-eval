@@ -10,6 +10,7 @@ from faq_eval.metrics import (
     CategoryRate,
     SettingMetrics,
     category_metrics,
+    consistency_metrics,
     paired_test,
     setting_metrics,
 )
@@ -211,69 +212,160 @@ def _examples(graded: list[GradedRecord]) -> list[GradedRecord]:
     return out
 
 
+def plot_temperature(ms: list[SettingMetrics], path: Path) -> None:
+    """Hallucination and accuracy against temperature: one column per prompt, one line per model."""
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    from matplotlib.ticker import PercentFormatter
+
+    models = _order({m.model for m in ms}, MODEL_ORDER)
+    prompts = _order({m.prompt for m in ms}, PROMPT_ORDER)
+    rows = [("hallucination", "Hallucination on unanswerable"), ("accuracy", "Accuracy on answerable")]
+    fig, axes = plt.subplots(len(rows), len(prompts), figsize=(3.7 * len(prompts) + 0.9, 6.6), dpi=150,
+                             facecolor=SURFACE, sharex=True, sharey="row", squeeze=False)
+    for r, (attr, label) in enumerate(rows):
+        for c, prompt in enumerate(prompts):
+            ax = axes[r][c]
+            _style(ax)
+            ends = []
+            for i, model in enumerate(models):
+                pts = sorted((m for m in ms if m.model == model and m.prompt == prompt), key=lambda m: m.temperature)
+                if not pts:
+                    continue
+                color = SERIES[i % len(SERIES)]
+                xs = [m.temperature for m in pts]
+                rates = [getattr(m, attr) for m in pts]
+                ax.fill_between(xs, [x.ci[0] for x in rates], [x.ci[1] for x in rates], color=color, alpha=0.10,
+                                linewidth=0)
+                ax.plot(xs, [x.p for x in rates], color=color, linewidth=2, zorder=3)
+                ax.scatter(xs, [x.p for x in rates], s=26, color=color, edgecolors=SURFACE, linewidths=1.5, zorder=4)
+                ends.append([xs[-1], rates[-1].p, model.split(":")[0]])
+            # Direct labels at the line ends, nudged apart so they don't overlap.
+            ends.sort(key=lambda e: e[1])
+            for k in range(1, len(ends)):
+                ends[k][1] = max(ends[k][1], ends[k - 1][1] + 0.055)
+            for x, y, text in ends:
+                ax.text(x + 0.05, y, text, color=INK, fontsize=8, va="center", ha="left")
+            ax.set_ylim(0, 1)
+            ax.yaxis.set_major_formatter(PercentFormatter(1.0, decimals=0))
+            ax.set_xlim(min(m.temperature for m in ms) - 0.05, max(m.temperature for m in ms) + 0.45)
+            ax.set_xticks(sorted({m.temperature for m in ms}))
+            if r == 0:
+                ax.set_title(f"{prompt} prompt", color=INK, fontsize=10, loc="left")
+            if c == 0:
+                ax.set_ylabel(label, color=INK_2, fontsize=9)
+            if r == len(rows) - 1:
+                ax.set_xlabel("temperature", color=INK_2, fontsize=9)
+    fig.suptitle("Temperature and hallucination", color=INK, fontsize=11, x=0.02, ha="left")
+    fig.text(0.02, 0.005, "Bands: Wilson 95% intervals. Temperature 0 is one answer per question; higher "
+             "temperatures pool three samples.", color=INK_2, fontsize=7.5)
+    fig.tight_layout(rect=(0, 0.03, 1, 1))
+    fig.savefig(path, facecolor=SURFACE)
+    plt.close(fig)
+
+
 def build_report(name: str) -> Path:
-    graded = load_graded(name)
-    if not graded:
+    graded_all = load_graded(name)
+    if not graded_all:
         raise ValueError(f"no graded results for {name!r}; run `faq-eval grade --name {name}` first")
-    ms = _sort_settings(setting_metrics(graded))
+    ms_all = _sort_settings(setting_metrics(graded_all))
+    temps = sorted({m.temperature for m in ms_all})
+    t0 = temps[0]
+    # Headline sections use the lowest temperature; the temperature section covers the rest.
+    graded = [g for g in graded_all if g.temperature == t0]
+    ms = [m for m in ms_all if m.temperature == t0]
     cats = category_metrics(graded)
     fig_dir = REPORTS_DIR / name
     fig_dir.mkdir(parents=True, exist_ok=True)
     plot_tradeoff(ms, fig_dir / "tradeoff.png")
     plot_categories(cats, ms, fig_dir / "categories.png")
+    if len(temps) > 1:
+        plot_temperature(ms_all, fig_dir / "temperature.png")
 
-    n_q = len({g.question_id for g in graded})
-    n_ans = len({g.question_id for g in graded if g.answerable})
-    methods = Counter(g.method for g in graded)
-    temps = sorted({m.temperature for m in ms})
-    samples = max(m.samples for m in ms)
+    n_q = len({g.question_id for g in graded_all})
+    n_ans = len({g.question_id for g in graded_all if g.answerable})
+    methods = Counter(g.method for g in graded_all)
     L: list[str] = []
     w = L.append
 
     w(f"# Results: `{name}`\n")
-    w(f"{len(graded)} answers: {n_q} questions ({n_ans} answerable, {n_q - n_ans} unanswerable) × "
-      f"{len({m.model for m in ms})} models × {len({m.prompt for m in ms})} prompts × "
-      f"temperature {', '.join(f'{t:g}' for t in temps)} × {samples} sample{'s' if samples > 1 else ''}.")
+    w(f"{len(graded_all)} answers: {n_q} questions ({n_ans} answerable, {n_q - n_ans} unanswerable) × "
+      f"{len({m.model for m in ms_all})} models × {len({m.prompt for m in ms_all})} prompts.\n")
+    for t in temps:
+        s = max(m.samples for m in ms_all if m.temperature == t)
+        w(f"- temperature {t:g}: {s} sample{'s' if s > 1 else ''} per question")
+    w("")
     w(f"Graded by rules ({methods.get('rule', 0)}) and the LLM judge ({methods.get('judge', 0)})"
       + (f"; {methods['judge_error']} kept the rule label after a judge failure" if methods.get("judge_error") else "")
       + ".\n")
     halfwidths = [(r.ci[1] - r.ci[0]) / 2 for m in ms for r in (m.accuracy, m.hallucination) if r.n]
     per_side = max(m.accuracy.n for m in ms)
     w(f"Intervals are Wilson 95%. With {per_side} answers per side per setting, intervals are "
-      f"±{min(halfwidths) * 100:.0f} to ±{max(halfwidths) * 100:.0f} percentage points wide, so differences of a few points between settings "
-      "are not meaningful on their own.\n")
+      f"±{min(halfwidths) * 100:.0f} to ±{max(halfwidths) * 100:.0f} percentage points wide, so differences of a "
+      "few points between settings are not meaningful on their own.\n")
 
-    w("## Headline\n")
+    w("## Headline" + (f" (temperature {t0:g})" if len(temps) > 1 else "") + "\n")
     w(f"![Accuracy vs refusal]({name}/tradeoff.png)\n")
     w("| Model | Prompt | Answerable accuracy | False refusals | Unanswerable refused | Hallucination | Balanced |")
     w("|---|---|---|---|---|---|---|")
     for m in ms:
-        w(f"| {m.model} | {m.prompt}{f' t={m.temperature:g}' if len(temps) > 1 else ''} | {m.accuracy.fmt()} | "
-          f"{m.false_refusal.fmt()} | {m.refusal.fmt()} | {m.hallucination.fmt()} | {_pct(m.balanced)} |")
+        w(f"| {m.model} | {m.prompt} | {m.accuracy.fmt()} | {m.false_refusal.fmt()} | {m.refusal.fmt()} | "
+          f"{m.hallucination.fmt()} | {_pct(m.balanced)} |")
     w("")
     w("Accuracy and false refusals are out of the answerable questions; refusal and hallucination are out of "
       "the unanswerable ones (they add to 100%). Balanced is the mean of accuracy and refusal.\n")
 
-    # Strict vs lenient on the same questions.
     pairs = []
     for model in _order({m.model for m in ms}, MODEL_ORDER):
-        for t in temps:
-            a, b = (model, "lenient", t), (model, "strict", t)
-            if {a, b} <= {m.key for m in ms}:
-                pairs.append((model, t, paired_test(graded, a, b, Label.HALLUCINATION),
-                              paired_test(graded, a, b, Label.CORRECT)))
+        a, b = (model, "lenient", t0), (model, "strict", t0)
+        if {a, b} <= {m.key for m in ms}:
+            pairs.append((model, paired_test(graded, a, b, Label.HALLUCINATION),
+                          paired_test(graded, a, b, Label.CORRECT)))
     if pairs:
         w("## Strict vs lenient prompt\n")
         w("Same questions under both prompts, compared with McNemar's exact test (only questions where the two "
           "prompts disagree count).\n")
         w("| Model | Hallucinations: lenient only / strict only | p | Correct answers: lenient only / strict only | p |")
         w("|---|---|---|---|---|")
-        for model, t, h, c in pairs:
-            w(f"| {model}{f' t={t:g}' if len(temps) > 1 else ''} | {h.only_a} / {h.only_b} | {h.p_value:.3g} | "
-              f"{c.only_a} / {c.only_b} | {c.p_value:.3g} |")
+        for model, h, c in pairs:
+            w(f"| {model} | {h.only_a} / {h.only_b} | {h.p_value:.3g} | {c.only_a} / {c.only_b} | {c.p_value:.3g} |")
         w("")
 
-    w("## By question type\n")
+    if len(temps) > 1:
+        cons = {(c.model, c.prompt, c.temperature): c for c in consistency_metrics(graded_all)}
+        by_key = {m.key: m for m in ms_all}
+        w("## Temperature\n")
+        w(f"![Temperature]({name}/temperature.png)\n")
+        for title, attr in (("Hallucination rate on unanswerable questions", "hallucination"),
+                            ("Accuracy on answerable questions", "accuracy")):
+            w(f"{title}:\n")
+            w("| Model | Prompt | " + " | ".join(f"t={t:g}" for t in temps) + " |")
+            w("|---|---|" + "---|" * len(temps))
+            for m in ms:
+                cells = [getattr(by_key[(m.model, m.prompt, t)], attr).fmt() if (m.model, m.prompt, t) in by_key
+                         else "n/a" for t in temps]
+                w(f"| {m.model} | {m.prompt} | " + " | ".join(cells) + " |")
+            w("")
+        hot = [t for t in temps if t != t0]
+        if cons:
+            for title, attr in (
+                ("Questions where every sample got the same label", "consistent"),
+                ("Unanswerable questions hallucinated in at least one sample (the risk for a student who asks a "
+                 "few times)", "any_hallucination"),
+            ):
+                w(f"{title}:\n")
+                w("| Model | Prompt | " + " | ".join(f"t={t:g}" for t in hot) + " |")
+                w("|---|---|" + "---|" * len(hot))
+                for m in ms:
+                    ks = [(m.model, m.prompt, t) for t in hot]
+                    w(f"| {m.model} | {m.prompt} | "
+                      + " | ".join(getattr(cons[k], attr).fmt() if k in cons else "n/a" for k in ks) + " |")
+                w("")
+        w("Pooling samples treats them as independent, so intervals at temperatures above 0 are somewhat too narrow.\n")
+
+    w("## By question type" + (f" (temperature {t0:g})" if len(temps) > 1 else "") + "\n")
     w(f"![Hallucination by category]({name}/categories.png)\n")
     cols = _order({c.category for c in cats if not c.answerable}, UNANSWERABLE_CATS)
     lookup = {(c.model, c.prompt, c.temperature, c.category): c for c in cats}
@@ -303,18 +395,22 @@ def build_report(name: str) -> Path:
 
     from faq_eval import labels
 
+    w("## How far to trust the grader\n")
+    a = None
     if labels.label_sheet_path(name).exists():
         try:
             a = labels.agreement(name)
         except ValueError:
             a = None
-        if a:
-            w("## How far to trust the grader\n")
-            w(f"{a.n} answers were hand-labelled blind. Rules alone agree with the hand labels on "
-              f"{a.rule_accuracy:.1%} ({a.rule_undecided} left undecided); rules plus judge agree on "
-              f"{a.final_accuracy:.1%} (Cohen's kappa {a.final_kappa:.2f}). The judge prompt was revised after "
-              "seeing these labels (generic advice is no longer counted as a hallucination), so this agreement "
-              "is likely optimistic. Details: `results/agreement/`.\n")
+    if a:
+        w(f"{a.n} answers were hand-labelled blind. Rules alone agree with the hand labels on "
+          f"{a.rule_accuracy:.1%} ({a.rule_undecided} left undecided); rules plus judge agree on "
+          f"{a.final_accuracy:.1%} (Cohen's kappa {a.final_kappa:.2f}). The judge prompt was revised after "
+          "seeing these labels (generic advice is no longer counted as a hallucination), so this agreement "
+          "is likely optimistic. Details: `results/agreement/`.\n")
+    else:
+        w("The same grader was checked against 60 hand labels from the main run; see `results/agreement/` "
+          "and `results/reports/main.md`. Answers at higher temperatures were not hand-labelled.\n")
 
     path = REPORTS_DIR / f"{name}.md"
     path.write_text("\n".join(L), encoding="utf-8")

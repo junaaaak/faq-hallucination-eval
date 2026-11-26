@@ -143,3 +143,34 @@ def paired_test(records: Iterable[GradedRecord], a: tuple, b: tuple, label: Labe
     neither = len(common) - only_a - only_b - both
     p = 1.0 if only_a + only_b == 0 else float(mcnemar([[both, only_a], [only_b, neither]], exact=True).pvalue)
     return PairedTest(a=a, b=b, measure=label.value, only_a=only_a, only_b=only_b, p_value=p)
+
+
+class ConsistencyMetrics(BaseModel):
+    """For settings with several samples per question (temperature > 0)."""
+    model: str
+    prompt: str
+    temperature: float
+    samples: int
+    consistent: Rate  # questions whose samples all got the same label
+    any_hallucination: Rate  # unanswerable questions hallucinated in at least one sample
+    any_error_answerable: Rate  # answerable questions answered wrongly or refused in at least one sample
+
+
+def consistency_metrics(records: Iterable[GradedRecord]) -> list[ConsistencyMetrics]:
+    groups: dict[tuple, dict[str, list[GradedRecord]]] = {}
+    for r in records:
+        groups.setdefault((r.model, r.prompt, r.temperature), {}).setdefault(r.question_id, []).append(r)
+    out = []
+    for (model, prompt, temp), by_q in groups.items():
+        samples = max(len(v) for v in by_q.values())
+        if samples < 2:
+            continue
+        una = [v for v in by_q.values() if not v[0].answerable]
+        ans = [v for v in by_q.values() if v[0].answerable]
+        out.append(ConsistencyMetrics(
+            model=model, prompt=prompt, temperature=temp, samples=samples,
+            consistent=Rate(k=sum(len({r.label for r in v}) == 1 for v in by_q.values()), n=len(by_q)),
+            any_hallucination=Rate(k=sum(any(r.label == Label.HALLUCINATION for r in v) for v in una), n=len(una)),
+            any_error_answerable=Rate(k=sum(any(r.label != Label.CORRECT for r in v) for v in ans), n=len(ans)),
+        ))
+    return sorted(out, key=lambda c: (c.model, c.prompt, c.temperature))

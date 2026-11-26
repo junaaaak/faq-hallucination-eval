@@ -1,6 +1,9 @@
 # Results: `main`
 
-720 answers: 120 questions (60 answerable, 60 unanswerable) × 3 models × 2 prompts × temperature 0 × 1 sample.
+720 answers: 120 questions (60 answerable, 60 unanswerable) × 3 models × 2 prompts.
+
+- temperature 0: 1 sample per question
+
 Graded by rules (598) and the LLM judge (122).
 
 Intervals are Wilson 95%. With 60 answers per side per setting, intervals are ±5 to ±12 percentage points wide, so differences of a few points between settings are not meaningful on their own.
