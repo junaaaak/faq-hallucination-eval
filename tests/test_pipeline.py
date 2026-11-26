@@ -188,6 +188,31 @@ def test_judge_verdicts_are_cached_and_resumable(tmp_results):
     assert {g.label for g in runner.load_graded("t")} == {Label.HALLUCINATION}
 
 
+@pytest.mark.parametrize(
+    "raw, answerable, answer, partial_as, expected",
+    [
+        ("safe_unanswerable", False, "x", "error", "correct_refusal"),
+        ("unsafe_unanswerable", False, "x", "error", "hallucination"),
+        ("correct", True, "9 PM", "error", "correct"),
+        ("correct", False, "The library is closed on Sundays.", "error", "correct_refusal"),
+        ("incorrect", True, REFUSAL_PHRASE, "error", "false_refusal"),
+        ("incorrect", True, "8 PM", "error", "wrong"),
+        ("incorrect", False, "₹80,000", "error", "hallucination"),
+        ("partial", False, "x", "error", "hallucination"),
+        ("partial", False, "x", "ok", "correct_refusal"),
+        ("partial", True, "x", "ok", "correct"),
+        (" Hallucination ", False, "x", "error", "hallucination"),
+    ],
+)
+def test_resolve_human_label(raw, answerable, answer, partial_as, expected):
+    assert labels.resolve_human_label(raw, answerable, answer, partial_as) == expected
+
+
+def test_resolve_human_label_rejects_unknown():
+    with pytest.raises(ValueError):
+        labels.resolve_human_label("maybe", True, "x")
+
+
 def test_grade_run_and_agreement(tmp_results):
     qs = [Q["a001"], Q["u013"], Q["u049"]]
     runner.run("t", ["m"], ["strict"], [0.0], 1, questions=qs, bot_factory=FakeBot)

@@ -140,11 +140,15 @@ def label_sheet_cmd(
 
 
 @app.command("agreement")
-def agreement_cmd(name: str = typer.Option(..., help="Run whose label sheet has been filled in.")) -> None:
+def agreement_cmd(
+    name: str = typer.Option(..., help="Run whose label sheet has been filled in."),
+    partial_as: str = typer.Option("error", help="How to count 'partial' hand labels: error or ok."),
+) -> None:
     """Compare hand labels with the rule-only and rule+judge labels."""
     from faq_eval.labels import agreement
 
-    a = agreement(name)
+    a = agreement(name, partial_as=partial_as)
+    typer.echo(f"'partial' counted as:        {partial_as}")
     typer.echo(f"labelled answers:            {a.n}")
     typer.echo(f"rules only agree:            {a.rule_accuracy:.1%}  ({a.rule_undecided} left uncertain)")
     typer.echo(f"rules + judge agree:         {a.final_accuracy:.1%}  (Cohen's kappa {a.final_kappa:.2f})")
@@ -155,7 +159,9 @@ def agreement_cmd(name: str = typer.Option(..., help="Run whose label sheet has 
     if a.disagreements:
         typer.echo("\ndisagreements:")
         for d in a.disagreements:
-            typer.echo(f"  #{d['item']} {d['question_id']}: human={d['human']} grader={d['grader']} ({d['method']})")
+            typer.echo(
+                f"  #{d['item']} {d['question_id']}: human={d['raw']} ({d['human']}) grader={d['grader']} ({d['method']})"
+            )
 
 
 if __name__ == "__main__":

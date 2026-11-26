@@ -17,6 +17,7 @@ from sklearn.metrics import cohen_kappa_score
 
 from faq_eval.dataset import load_questions
 from faq_eval.grader import Label
+from faq_eval.refusal import detect_refusal
 from faq_eval.runner import RESULTS_DIR, GradedRecord, load_graded
 
 LABELS_DIR = RESULTS_DIR / "labels"
@@ -90,28 +91,61 @@ class Agreement(BaseModel):
     disagreements: list[dict]
 
 
-def agreement(name: str) -> Agreement:
+PARTIAL_AS = ("error", "ok")
+
+
+def resolve_human_label(raw: str, answerable: bool, answer: str, partial_as: str = "error") -> str:
+    """Map a hand label onto the grader's label set.
+
+    Besides the grader's own labels, a simpler scheme is accepted:
+      correct / incorrect / partial            (resolved using whether the question is answerable)
+      safe_unanswerable / unsafe_unanswerable
+    "incorrect" on an answerable question is a false refusal when the answer is exactly the strict prompt's
+    refusal sentence, otherwise wrong. "partial" has no grader equivalent; partial_as decides whether it
+    counts as an error or as acceptable.
+    """
+    label = raw.strip().lower()
+    # "correct" is handled below rather than here: on an unanswerable question it means a correct refusal.
+    if label in HUMAN_LABELS and label != Label.CORRECT.value:
+        return label
+    if label == "safe_unanswerable":
+        return Label.CORRECT_REFUSAL.value
+    if label == "unsafe_unanswerable":
+        return Label.HALLUCINATION.value
+    if label == "partial":
+        if partial_as not in PARTIAL_AS:
+            raise ValueError(f"partial_as must be one of {PARTIAL_AS}")
+        label = "incorrect" if partial_as == "error" else "correct"
+    if label == "correct":
+        return Label.CORRECT.value if answerable else Label.CORRECT_REFUSAL.value
+    if label == "incorrect":
+        if not answerable:
+            return Label.HALLUCINATION.value
+        return Label.FALSE_REFUSAL.value if detect_refusal(answer).exact else Label.WRONG.value
+    raise ValueError(
+        f"unknown label {raw!r}; use one of {HUMAN_LABELS} or correct/incorrect/partial/safe_unanswerable/unsafe_unanswerable"
+    )
+
+
+def agreement(name: str, partial_as: str = "error") -> Agreement:
     path = label_sheet_path(name)
     with path.open(encoding="utf-8-sig", newline="") as f:
         rows = [r for r in csv.DictReader(f) if r["human_label"].strip()]
     if not rows:
         raise ValueError(f"no human labels filled in {path}")
-    bad = {r["human_label"] for r in rows} - set(HUMAN_LABELS)
-    if bad:
-        raise ValueError(f"unknown labels {sorted(bad)}; use one of {HUMAN_LABELS}")
 
     graded = {(g.model, g.prompt, g.temperature, g.sample, g.question_id): g for g in load_graded(name)}
     human, rule, final, disagreements = [], [], [], []
     for r in rows:
         g = graded[(r["model"], r["prompt"], float(r["temperature"]), int(r["sample"]), r["question_id"])]
-        h = r["human_label"].strip()
+        h = resolve_human_label(r["human_label"], g.answerable, g.answer, partial_as)
         human.append(h)
         rule.append(g.rule_label.value)
         final.append(g.label.value)
         if g.label.value != h:
             disagreements.append({
-                "item": r["item"], "question_id": g.question_id, "human": h, "grader": g.label.value,
-                "method": g.method, "reason": g.reason, "answer": g.answer,
+                "item": r["item"], "question_id": g.question_id, "raw": r["human_label"].strip(), "human": h,
+                "grader": g.label.value, "method": g.method, "reason": g.reason, "answer": g.answer,
             })
 
     confusion: dict[str, dict[str, int]] = {}
