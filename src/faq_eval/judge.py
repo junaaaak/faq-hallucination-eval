@@ -4,12 +4,17 @@ A small judge model is unreliable when asked for a verdict directly: it tends to
 *question* is answerable rather than whether the *answer* says anything unsupported. So the judge only
 fills in narrow fields, and the verdict is computed from them in code:
 
-- claims:            each factual statement the answer makes, marked supported / not supported by the sheet
+- claims:            each statement the answer makes, marked supported / not supported by the sheet, and
+                     tagged by kind: about the college or the student, about the outside world, or general advice
 - declines:          the answer says it can't answer, the information isn't available, or points elsewhere
 - gives_reference:   (answerable questions) the answer conveys the reference answer
 
+Generic advice (how to calculate a percentage, what laptop specs suit engineering) is not counted as a
+hallucination: it says nothing false about the college. Unsupported claims about the college, the student
+or the outside world are.
+
 Verdict:
-- any unsupported claim                       -> unsupported (wrong / hallucination)
+- any unsupported non-advice claim            -> unsupported (wrong / hallucination)
 - answerable and gives_reference              -> correct
 - answerable and declines                     -> refusal (false refusal)
 - answerable otherwise                        -> unsupported (wrong)
@@ -23,9 +28,10 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from enum import Enum
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, ValidationError
 
@@ -48,9 +54,22 @@ def _is_meta(claim: str) -> bool:
     return r.is_refusal or r.clarifying or r.redirect
 
 
+# Specific facts that can't be generic advice: money, percentages, emails, phone numbers, the college's name.
+# The judge sometimes tags a fabricated fact ("the ECE highest package was ₹42 lakh") as advice.
+_FACT_MARKER_RE = re.compile(r"₹|\brs\.?\s*\d|\blakh|\bcrore|\d\s*%|\S+@\S+|\d[\d\s-]{6,}\d|northbridge", re.I)
+
+
 class Claim(BaseModel):
     claim: str
     supported: bool
+    # college: about Northbridge, its offices, rules, fees, people or events, or about the student asking.
+    # world:   a factual statement about anything else (other colleges, sport, geography).
+    # advice:  a general recommendation or how-to that isn't about this college.
+    kind: Literal["college", "world", "advice"] = "college"
+
+    @property
+    def is_advice(self) -> bool:
+        return self.kind == "advice" and not _FACT_MARKER_RE.search(self.claim)
 
 
 class JudgeOutput(BaseModel):
@@ -63,8 +82,10 @@ class JudgeOutput(BaseModel):
     @property
     def unsupported_claims(self) -> list[str]:
         # The judge sometimes lists meta statements ("the cost is not mentioned", "I need to know your semester")
-        # as claims; those aren't facts about the college, so they're dropped here.
-        return [c.claim for c in self.claims if not c.supported and not _is_meta(c.claim)]
+        # as claims; those aren't facts about the college, so they're dropped here. Generic advice is dropped too.
+        return [
+            c.claim for c in self.claims if not c.supported and not c.is_advice and not _is_meta(c.claim)
+        ]
 
     def verdict(self, answerable: bool, refusal_signals: bool = True) -> Verdict:
         """refusal_signals: the rules saw a refusal, redirect or clarifying question in the answer.
@@ -99,6 +120,8 @@ class JudgeOutput(BaseModel):
 
 
 JUDGE_SCHEMA = JudgeOutput.model_json_schema()
+# kind has a default only so older cached outputs still load; the judge must always fill it in.
+JUDGE_SCHEMA["$defs"]["Claim"]["required"] = ["claim", "supported", "kind"]
 
 _SYSTEM = """You check a college FAQ bot's answer against a fact sheet. Use ONLY the fact sheet below.
 Ignore your own knowledge: a statement that is true in the real world but not in the fact sheet is NOT supported.
@@ -117,6 +140,14 @@ Return JSON with these fields:
   * A claim that stretches a fact to something the sheet doesn't cover is NOT supported
     (e.g. the sheet gives a fee "per semester" and the answer says it is the fee "during summer vacation").
   * General knowledge, recommendations and how-to advice count as claims and are NOT supported unless the sheet says them.
+  * "kind" for each claim:
+      "college" - says something about Northbridge Institute of Technology (its departments, offices, staff,
+                  facilities, rules, fees, dates, events, what its offices can do) or about the student asking.
+      "world"   - a factual statement about anything outside the college (other colleges and their rankings,
+                  sport, geography, history, companies).
+      "advice"  - a general recommendation, opinion or how-to that would apply to any college and states no fact
+                  about this one (how to calculate a percentage, what laptop specs suit engineering, be respectful).
+    If a claim mixes advice with a fact about the college (e.g. "assume there is no strict dress code here"), it is "college".
   * Copy each claim as the answer states it. Do not rewrite a claim into what the fact sheet says instead.
   * Leave out only statements about what the bot knows ("I don't have that information", "the fact sheet doesn't
     mention it"), pointers to where to look ("check the student portal", "contact the office"), and requests for

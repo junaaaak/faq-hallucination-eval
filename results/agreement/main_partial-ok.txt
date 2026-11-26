@@ -1,11 +1,11 @@
 'partial' counted as:        ok
 labelled answers:            60
-rules only agree:            66.7%  (14 left uncertain)
-rules + judge agree:         76.7%  (Cohen's kappa 0.70)
-agree on 'is it an error?':  76.7%
+rules only agree:            66.7%  (15 left uncertain)
+rules + judge agree:         88.3%  (Cohen's kappa 0.84)
+agree on 'is it an error?':  88.3%
 
 confusion (human -> grader):
-  correct_refusal  {'hallucination': 10, 'correct_refusal': 14}
+  correct_refusal  {'hallucination': 3, 'correct_refusal': 21}
   correct          {'correct': 8, 'wrong': 4}
   false_refusal    {'false_refusal': 7}
   hallucination    {'hallucination': 14}
@@ -13,16 +13,17 @@ confusion (human -> grader):
 
 disagreements:
   #1 u054: human=partial (correct_refusal) grader=hallucination (judge)
-  #14 u022: human=safe_unanswerable (correct_refusal) grader=hallucination (judge)
   #15 a053: human=correct (correct) grader=wrong (rule)
-  #16 u034: human=safe_unanswerable (correct_refusal) grader=hallucination (judge)
-  #18 u050: human=safe_unanswerable (correct_refusal) grader=hallucination (judge)
   #22 a055: human=partial (correct) grader=wrong (rule)
   #29 u058: human=partial (correct_refusal) grader=hallucination (judge)
-  #39 u056: human=safe_unanswerable (correct_refusal) grader=hallucination (judge)
-  #42 u007: human=safe_unanswerable (correct_refusal) grader=hallucination (judge)
   #44 a050: human=partial (correct) grader=wrong (rule)
   #46 u004: human=safe_unanswerable (correct_refusal) grader=hallucination (judge)
-  #47 u007: human=partial (correct_refusal) grader=hallucination (judge)
-  #48 u049: human=safe_unanswerable (correct_refusal) grader=hallucination (judge)
   #50 a053: human=correct (correct) grader=wrong (rule)
+
+note: the judge prompt was revised after these labels were collected (generic advice that states no fact
+about the college is no longer counted as a hallucination). Agreement is measured on the same 60 labels
+that motivated the change, so it is likely optimistic. Before the change: rules + judge agreed on 80.0%
+(kappa 0.73) with partial counted as an error, 76.7% (kappa 0.70) with partial counted as ok.
+Known judge errors outside the labelled set after the change: u042 (qwen, lenient) correctly says fees are
+paid only through the portal but is marked hallucination; u047 (gemma, lenient) is marked hallucination
+for pointing to the college website.

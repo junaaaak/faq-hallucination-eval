@@ -47,7 +47,7 @@ _REDIRECT_RE = re.compile(
 # Asking the student for details, which implies an answer exists if they reply.
 _CLARIFY_RE = re.compile(
     r"\b(?:(?:could|can|would) you (?:please )?(?:tell|share|provide|let me know|confirm|specify)"
-    r"|please (?:provide|share|tell)|i (?:would )?need (?:to know|more|some|your)|i'll need (?:to know|more|some|your))\b"
+    r"|please (?:provide|share|tell)|i (?:would )?need (?:to know|more|some|your|a (?:little|bit) more)|i'll need (?:to know|more|some|your))\b"
 )
 
 

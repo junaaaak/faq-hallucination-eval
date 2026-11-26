@@ -85,6 +85,36 @@ def test_meta_claims_are_ignored():
     assert out.unsupported_claims == []
 
 
+def test_generic_advice_is_not_a_hallucination():
+    out = JudgeOutput(
+        claims=[
+            Claim(claim="Look for at least 16GB of RAM and an SSD.", supported=False, kind="advice"),
+            Claim(claim="Attendance is classes attended divided by classes scheduled, times 100.", supported=False, kind="advice"),
+        ],
+        declines=True,
+    )
+    assert out.unsupported_claims == []
+    assert out.verdict(False) == Verdict.REFUSAL
+
+
+@pytest.mark.parametrize(
+    "claim",
+    [
+        "The highest package for ECE students was **₹42 lakh per year**.",
+        "Log into the Northbridge student portal to see your library account.",
+        "Call +91-80-4000-1299 for the hostel office.",
+    ],
+)
+def test_specific_facts_tagged_as_advice_still_count(claim):
+    out = JudgeOutput(claims=[Claim(claim=claim, supported=False, kind="advice")], declines=False)
+    assert out.unsupported_claims == [claim]
+
+
+def test_world_facts_still_count():
+    out = JudgeOutput(claims=[Claim(claim="IIT Delhi is the top college in India.", supported=False, kind="world")], declines=True)
+    assert out.verdict(False) == Verdict.UNSUPPORTED
+
+
 @pytest.mark.parametrize(
     "qid, verdict, label",
     [
