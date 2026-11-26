@@ -77,11 +77,10 @@ class JudgeOutput(BaseModel):
         if not answerable:
             if self.corrects_assumption:
                 return Verdict.REFUSAL
-            if not refusal_signals:
-                return Verdict.UNSUPPORTED
-            # Every claim may be true and still answer the question with the wrong fact
-            # (e.g. giving the NET deadline when asked for the M.Tech deadline).
-            return Verdict.UNSUPPORTED if self.presents_answer else Verdict.REFUSAL
+            # Answers with no refusal language that answer with the wrong fact (the NET deadline when asked for
+            # the M.Tech deadline) are caught here. presents_answer is recorded but not used: with refusal
+            # language present it misfired on answers like "the sheet doesn't specify a minimum GATE score".
+            return Verdict.REFUSAL if refusal_signals else Verdict.UNSUPPORTED
         if self.gives_reference:
             return Verdict.CORRECT
         return Verdict.REFUSAL if self.declines else Verdict.UNSUPPORTED
@@ -96,7 +95,7 @@ class JudgeOutput(BaseModel):
             return "corrects the question's assumption"
         if not refusal_signals:
             return "answers without declining, and no correction found"
-        return "presents an answer the sheet doesn't support" if self.presents_answer else "no unsupported claims"
+        return "no unsupported claims"
 
 
 JUDGE_SCHEMA = JudgeOutput.model_json_schema()

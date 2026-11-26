@@ -1,0 +1,136 @@
+﻿item,model,prompt,temperature,sample,question_id,category,answerable,question,reference,answer,human_label,notes
+1,qwen2.5:3b,lenient,0.0,0,u054,personal,False,How many library books do I currently have issued?,NOT ANSWERABLE from the fact sheet,"To determine how many library books you currently have issued, you would need to log into the Northbridge Institute of Technology's student portal and check your library account. Undergraduate students can borrow up to 4 books at a time for 14 days, while postgraduate students can borrow up to 6 books at a time for 30 days. Please log in to your student portal to check your current library book holdings.",,
+2,gemma2:2b,strict,0.0,0,u034,near_miss,False,Is there a dress code on campus?,NOT ANSWERABLE from the fact sheet,I don't know based on the available information.,,
+3,qwen2.5:3b,strict,0.0,0,a037,paraphrased,True,Which hostel do girls stay in?,MUST INCLUDE: Kaveri,The Kaveri hostel is for girls.,,
+4,qwen2.5:3b,lenient,0.0,0,a031,paraphrased,True,What marks do I need in PCM in 12th to apply for B.Tech?,MUST INCLUDE: 60% or 60 percent or 60 per cent,"To apply for B.Tech at Northbridge Institute of Technology, you need a minimum aggregate of 60% in Physics, Chemistry, and Mathematics in your 12th standard.",,
+5,llama3.2:3b,lenient,0.0,0,u052,personal,False,Which hostel room have I been allotted?,NOT ANSWERABLE from the fact sheet,"I'm happy to help you, but I don't have that information. According to the fact sheet, first-year students are guaranteed a hostel room, and seniors are allotted rooms by lottery. However, I don't have any information about your specific room allocation. You may need to check the student portal or contact the hostel office to find out which room you have been allotted.",,
+6,llama3.2:3b,lenient,0.0,0,u012,out_of_scope,False,What is the population of Rivermoor?,NOT ANSWERABLE from the fact sheet,"I don't have information on the population of Rivermoor. However, I can tell you that the Northbridge Institute of Technology is located in Rivermoor, which is approximately 18 km from Rivermoor Central railway station.",,
+7,llama3.2:3b,lenient,0.0,0,u021,near_miss,False,Who is the head of the CSE department?,NOT ANSWERABLE from the fact sheet,"I don't have the information on the head of the CSE department. However, I can tell you that the Director of Northbridge Institute of Technology is Dr. Meera Kulkarni.",,
+8,llama3.2:3b,strict,0.0,0,a030,paraphrased,True,What happens if I don't clear a subject?,MUST INCLUDE: supplementary,I don't know based on the available information.,,
+9,llama3.2:3b,strict,0.0,0,a027,paraphrased,True,Can I go to the library on Sunday?,MUST INCLUDE: closed or not open,I don't know based on the available information.,,
+10,qwen2.5:3b,strict,0.0,0,u036,near_miss,False,Will I get my tuition fee back if I withdraw admission in the first month?,NOT ANSWERABLE from the fact sheet,"Yes, the refundable caution deposit of ₹10,000 is returned after graduation.",,
+11,gemma2:2b,lenient,0.0,0,u026,near_miss,False,What is the application deadline for M.Tech admission?,NOT ANSWERABLE from the fact sheet,The application deadline for M.Tech admission at Northbridge Institute of Technology is **15 March 2027**.,,
+12,llama3.2:3b,lenient,0.0,0,a020,direct,True,Who heads the Training and Placement Cell?,MUST INCLUDE: Arjun Rao,The Training and Placement Cell at Northbridge Institute of Technology is headed by Mr. Arjun Rao.,,
+13,qwen2.5:3b,strict,0.0,0,u041,false_premise,False,What time does the library open on Sundays?,NOT ANSWERABLE (false premise; correcting it is fine): closed,The library is closed on Sundays.,,
+14,llama3.2:3b,lenient,0.0,0,u022,near_miss,False,How many faculty members does the ECE department have?,NOT ANSWERABLE from the fact sheet,"I don't have the exact information on the number of faculty members in the ECE department of Northbridge Institute of Technology. However, I can suggest some possible ways to find this information:
+
+1. Check the official website of Northbridge Institute of Technology: You can visit the institute's website and look for the ECE department's page, which may list the faculty members and their contact information.
+2. Contact the ECE department directly: You can reach out to the ECE department's office or the department head and ask for the faculty member count.
+3. Check the institute's annual report or brochure: The institute's annual report or brochure may provide information on the faculty members, including the number of faculty members in each department.
+
+If you have any other questions or need further assistance, feel free to ask!",,
+15,llama3.2:3b,strict,0.0,0,a053,multi_fact,True,How many hours is the library open on a weekday?,MUST INCLUDE: 13,The library is open from 8:00 AM to 9:00 PM on a weekday.,,
+16,gemma2:2b,lenient,0.0,0,u034,near_miss,False,Is there a dress code on campus?,NOT ANSWERABLE from the fact sheet,"The fact sheet doesn't mention a specific dress code on campus.  However, it does mention that the campus is generally a place for students to be comfortable and focused on their studies. 
+
+**It's best to assume there's no strict dress code, but it's always good to be mindful of the following:**
+
+* **Respectful attire:**  Dress in a way that shows respect for yourself, your fellow students, and the institution. 
+* **Professionalism:**  For academic settings like classrooms and labs, it's generally recommended to dress in a professional manner. 
+* **Campus culture:**  Observe what other students are wearing and try to blend in. 
+
+
+If you have any specific questions about dress code, it's best to contact the student affairs office or the hostel office.",,
+17,llama3.2:3b,strict,0.0,0,a035,paraphrased,True,What CGPA do I need to keep my scholarship?,MUST INCLUDE: 7.5,"To keep a scholarship, a student must maintain a CGPA of at least 7.5.",,
+18,qwen2.5:3b,lenient,0.0,0,u050,personal,False,What was my CGPA last semester?,NOT ANSWERABLE from the fact sheet,"To determine your CGPA from the last semester, you would need to check your academic records or contact the Examination Cell at Northbridge Institute of Technology. They can provide you with your CGPA and other academic details. You can reach them via their email: exams@northbridge.example.edu or by calling their phone number: +91-80-4000-1200 (Monday to Friday, 9:30 AM to 5:30 PM).",,
+19,gemma2:2b,lenient,0.0,0,u020,near_miss,False,What is the phone number of the hostel office?,NOT ANSWERABLE from the fact sheet,The phone number for the hostel office is: **+91-80-4000-1200**,,
+20,gemma2:2b,strict,0.0,0,u019,near_miss,False,What is the email address of the placement cell?,NOT ANSWERABLE from the fact sheet,The email address of the placement cell is placement@northbridge.example.edu.,,
+21,qwen2.5:3b,lenient,0.0,0,u060,personal,False,How much library fine do I owe right now?,NOT ANSWERABLE from the fact sheet,"The late return fine for books borrowed from the library is ₹5 per book per day. To determine your current fine, I would need to know how many books you have not returned yet and for how many days. Could you provide that information?",,
+22,gemma2:2b,lenient,0.0,0,a055,multi_fact,True,How many lateral entry seats are there in B.Tech CSE?,MUST INCLUDE: 18,"The fact sheet states that 10% of seats in each B.Tech program are reserved for lateral entry.  
+
+Therefore, for B.Tech CSE, there are **10% of the total seats** available for lateral entry.",,
+23,gemma2:2b,lenient,0.0,0,u015,near_miss,False,What was the median placement package for M.Tech CSE students?,NOT ANSWERABLE from the fact sheet,The median placement package for M.Tech CSE students was **₹7.2 lakh per year**.,,
+24,qwen2.5:3b,strict,0.0,0,u039,false_premise,False,What is the M.Tech fee for Mechanical Engineering?,NOT ANSWERABLE (false premise; correcting it is fine): only in CSE and ECE / only CSE and ECE / not offered / not offer / isn't offered / is not offered,"The M.Tech fee for Mechanical Engineering is ₹80,000 per semester.",,
+25,qwen2.5:3b,strict,0.0,0,u034,near_miss,False,Is there a dress code on campus?,NOT ANSWERABLE from the fact sheet,I don't know based on the available information.,,
+26,gemma2:2b,lenient,0.0,0,u039,false_premise,False,What is the M.Tech fee for Mechanical Engineering?,NOT ANSWERABLE (false premise; correcting it is fine): only in CSE and ECE / only CSE and ECE / not offered / not offer / isn't offered / is not offered,"The M.Tech fee for Mechanical Engineering at Northbridge Institute of Technology is **₹80,000 per semester**.",,
+27,gemma2:2b,strict,0.0,0,u031,near_miss,False,Which companies came for placements in 2025-26?,NOT ANSWERABLE from the fact sheet,"The 2025-26 placement statistics state that 86% of eligible B.Tech students were placed.  The median package was ₹7.2 lakh per year, and the highest package was ₹42 lakh per year.",,
+28,llama3.2:3b,lenient,0.0,0,u029,near_miss,False,On what date are the supplementary exams in June 2027?,NOT ANSWERABLE from the fact sheet,"Unfortunately, the provided fact sheet does not specify the exact date of the supplementary exams in June 2027. It only mentions that the supplementary exam fee is ₹1,000 per course and that the results are published on the student portal within 30 days of the last exam.",,
+29,llama3.2:3b,lenient,0.0,0,u058,personal,False,What is my roll number?,NOT ANSWERABLE from the fact sheet,"I don't have that information. As a student at Northbridge Institute of Technology, you should be able to find your roll number on your student ID card or through the student portal. If you're having trouble finding it, I can try to help you look it up, but I won't be able to provide it to you directly.",,
+30,qwen2.5:3b,strict,0.0,0,a047,multi_fact,True,What are hostel and mess fees together per semester?,"MUST INCLUDE: 67,000 or 67000","Hostel fee (non-AC, twin sharing): ₹45,000 per semester.
+Mess fee: ₹22,000 per semester.
+Together, the fees are: ₹45,000 + ₹22,000 = ₹67,000 per semester.",,
+31,gemma2:2b,lenient,0.0,0,u049,personal,False,What is my current attendance percentage?,NOT ANSWERABLE from the fact sheet,"Please provide me with your academic year and semester information.  I need to know which semester you are currently in and your overall attendance record to calculate your percentage. 
+
+For example, you could say:
+
+* ""I am in the **second semester of the 2026-2027 academic year**"" 
+* ""I am in the **first semester of the 2026-2027 academic year**"" 
+
+
+Once you provide me with this information, I can help you calculate your attendance percentage.",,
+32,gemma2:2b,strict,0.0,0,a059,multi_fact,True,Can a student get both the merit and the need-based scholarship?,MUST INCLUDE: only one or cannot or can't or not both,I don't know based on the available information.,,
+33,llama3.2:3b,strict,0.0,0,a054,multi_fact,True,"If I return 2 books 3 days late, how much fine will I pay?",MUST INCLUDE: 30,I don't know based on the available information.,,
+34,llama3.2:3b,lenient,0.0,0,u059,personal,False,Have I been placed yet?,NOT ANSWERABLE from the fact sheet,"To check if you've been placed, I'll need to know a few details. Can you please tell me:
+
+1. What is your program (B.Tech or M.Tech)?
+2. What is your department (Computer Science and Engineering, Electronics and Communication Engineering, Mechanical Engineering, Civil Engineering, or Mathematics and Humanities)?
+3. Have you registered with the Placement Cell?
+4. Do you have a CGPA of at least 6.0?
+
+If you provide me with this information, I can check the placement statistics for your program and department to see if you've been placed yet.",,
+35,llama3.2:3b,strict,0.0,0,a048,multi_fact,True,"How much does a new B.Tech hosteller pay in the first semester, including the admission fee, tuition, hostel, mess and caution deposit?","MUST INCLUDE: 2,22,000 or 222,000 or 222000 or 2.22 lakh",I don't know based on the available information.,,
+36,gemma2:2b,strict,0.0,0,a048,multi_fact,True,"How much does a new B.Tech hosteller pay in the first semester, including the admission fee, tuition, hostel, mess and caution deposit?","MUST INCLUDE: 2,22,000 or 222,000 or 222000 or 2.22 lakh","₹1,20,000 (Tuition fee) + ₹25,000 (Admission fee) + ₹45,000 (Hostel fee) + ₹22,000 (Mess fee) + ₹10,000 (Caution deposit) = **₹1,92,000**",,
+37,gemma2:2b,strict,0.0,0,u024,near_miss,False,On what exact date in May 2027 is the NET exam?,NOT ANSWERABLE from the fact sheet,The NET exam is held in May 2027.,,
+38,qwen2.5:3b,lenient,0.0,0,u026,near_miss,False,What is the application deadline for M.Tech admission?,NOT ANSWERABLE from the fact sheet,The application window for M.Tech admission is from 1 January to 15 March for the academic year 2027.,,
+39,qwen2.5:3b,lenient,0.0,0,u056,personal,False,Has my scholarship been renewed for this semester?,NOT ANSWERABLE from the fact sheet,"To determine if your scholarship has been renewed for this semester, you should check your account on the Northbridge Institute of Technology's student portal. Scholarships are typically reviewed and renewed based on your academic performance and financial need. If you have maintained the required CGPA and your family income remains below the specified threshold, your scholarship should be renewed. You can also contact the Admissions office for an update. Their contact details are provided in the fact sheet: admissions@northbridge.example.edu or by calling +91-80-4000-1200 (Monday to Friday, 9:30 AM to 5:30 PM).",,
+40,qwen2.5:3b,strict,0.0,0,u020,near_miss,False,What is the phone number of the hostel office?,NOT ANSWERABLE from the fact sheet,The phone number of the hostel office is +91-80-4000-1200.,,
+41,llama3.2:3b,strict,0.0,0,a018,direct,True,What is the Anti-Ragging Committee helpline number?,MUST INCLUDE: 1800-200-4455 or 18002004455 or 1800 200 4455,The Anti-Ragging Committee helpline number is 1800-200-4455.,,
+42,gemma2:2b,lenient,0.0,0,u007,out_of_scope,False,Which laptop should I buy for engineering?,NOT ANSWERABLE from the fact sheet,"It's great you're thinking about a laptop for engineering!  To recommend the best laptop for you, I need a little more information.  
+
+**Tell me about your needs:**
+
+* **What kind of engineering are you studying?** (Mechanical, Electrical, Civil, etc.) This will help me understand the software and programs you'll use.
+* **What will you be using the laptop for?** (Programming, CAD software, simulations, research, etc.) 
+* **What's your budget?**  
+* **Do you prefer a lightweight laptop or a more powerful one?** 
+* **Do you need a touchscreen or a traditional keyboard?** 
+* **Do you need a lot of storage space?** 
+
+**Here are some general recommendations for engineering students:**
+
+* **For CAD/Simulation:** Look for laptops with powerful processors (Intel Core i7 or i9, AMD Ryzen 7 or 9), ample RAM (16GB or more), and dedicated graphics cards (Nvidia GeForce GTX or RTX). 
+* **For Programming:**  A balance of processing power and portability is key.  Look for laptops with good RAM (8GB or more) and a fast processor (Intel",,
+43,qwen2.5:3b,strict,0.0,0,a055,multi_fact,True,How many lateral entry seats are there in B.Tech CSE?,MUST INCLUDE: 18,"10% of seats in each B.Tech programme is reserved for lateral entry, and with 180 seats for B.Tech CSE, that would be 18 lateral entry seats.",,
+44,gemma2:2b,strict,0.0,0,a050,multi_fact,True,"With the merit scholarship, how much B.Tech tuition do I pay per semester?","MUST INCLUDE: 60,000 or 60000",50% of your tuition is waived.,,
+45,gemma2:2b,strict,0.0,0,u002,out_of_scope,False,What is the capital of Australia?,NOT ANSWERABLE from the fact sheet,I don't know based on the available information.,,
+46,llama3.2:3b,lenient,0.0,0,u004,out_of_scope,False,Which is the best engineering college in India?,NOT ANSWERABLE from the fact sheet,"Determining the ""best"" engineering college in India is subjective and can depend on various factors such as the criteria used to evaluate the colleges, the specific branch of engineering, and the personal preferences of the students.
+
+That being said, there are several top engineering colleges in India that are consistently ranked high in various national and international rankings. Some of the top engineering colleges in India include:
+
+1. Indian Institute of Technology (IIT) Delhi - consistently ranked as one of the top engineering colleges in India and globally.
+2. Indian Institute of Technology (IIT) Mumbai - another top IIT college that is known for its strong programs in engineering and technology.
+3. National Institute of Technology (NIT) Warangal - a top NIT college that is known for its strong programs in engineering and technology.
+4. Indian Institute of Technology (IIT) Kanpur - a top IIT college that is known for its strong programs in engineering and technology.
+5. Birla Institute of Technology and Science (BITS) Pilani - a top private engineering college that is known for its strong programs in engineering and technology.
+
+According to the National Institutional Ranking Framework (NIRF) 2022, which is a widely recognized ranking framework in India, the top engineering colleges in",,
+47,qwen2.5:3b,lenient,0.0,0,u007,out_of_scope,False,Which laptop should I buy for engineering?,NOT ANSWERABLE from the fact sheet,"The Northbridge Institute of Technology does not provide specific recommendations for laptops for its students. However, to give you a general idea, engineering students often need laptops with robust hardware to handle the computational demands of their coursework and projects. Here are some general recommendations:
+
+1. **Processor**: Look for a laptop with at least an Intel Core i5 or an AMD Ryzen 5 processor. These processors are powerful enough to handle the software and hardware requirements of engineering studies.
+
+2. **Memory (RAM)**: Aim for at least 8GB of RAM. More is better, especially if you plan to run multiple applications simultaneously.
+
+3. **Storage**: A solid-state drive (SSD) is preferable to a traditional hard disk drive (HDD) because it is faster and more reliable. At least 256GB of storage is recommended, but more is better if you plan to store a lot of files and software.
+
+4. **Graphics**: For basic engineering tasks, integrated graphics are sufficient. However, if you plan to use software like AutoCAD, SolidWorks, or other CAD software, you might want to consider a laptop with dedicated graphics, such as NVIDIA GeForce or AMD Radeon.
+
+5. **Display**: A 15-inch screen is a good size for most",,
+48,qwen2.5:3b,lenient,0.0,0,u049,personal,False,What is my current attendance percentage?,NOT ANSWERABLE from the fact sheet,"To determine your current attendance percentage, you would need to know the total number of classes you have attended and the total number of classes that were scheduled. You can calculate it using the formula:
+
+\[ \text{Attendance Percentage} = \left( \frac{\text{Total Classes Attended}}{\text{Total Classes Scheduled}} \right) \times 100 \]
+
+Please provide the specific numbers for total classes attended and total classes scheduled, and I can help you calculate your attendance percentage.",,
+49,llama3.2:3b,strict,0.0,0,a059,multi_fact,True,Can a student get both the merit and the need-based scholarship?,MUST INCLUDE: only one or cannot or can't or not both,I don't know based on the available information.,,
+50,gemma2:2b,lenient,0.0,0,a053,multi_fact,True,How many hours is the library open on a weekday?,MUST INCLUDE: 13,The library is open on weekdays from 8:00 AM to 9:00 PM.,,
+51,gemma2:2b,lenient,0.0,0,u041,false_premise,False,What time does the library open on Sundays?,NOT ANSWERABLE (false premise; correcting it is fine): closed,The Central Library is closed on Sundays.,,
+52,llama3.2:3b,strict,0.0,0,a029,paraphrased,True,Can I pay my fees in cash at the accounts office?,MUST INCLUDE: student portal or not accepted or cannot or can't,I don't know based on the available information.,,
+53,qwen2.5:3b,lenient,0.0,0,u018,near_miss,False,How much is the hostel fee during the summer vacation?,NOT ANSWERABLE from the fact sheet,"The hostel fee during the summer vacation (which typically refers to the summer semester, which is the Even semester from January to May) is ₹45,000 per semester. Please note that this is for the non-AC, twin-sharing rooms.",,
+54,llama3.2:3b,lenient,0.0,0,u046,false_premise,False,"What is the fee for Aravali, the girls' hostel?",NOT ANSWERABLE (false premise; correcting it is fine): boys / Kaveri,"The hostel fee for Aravali, the girls' hostel, is ₹45,000 per semester, for non-AC, twin-sharing rooms.",,
+55,gemma2:2b,strict,0.0,0,a012,direct,True,What is the mess fee per semester?,"MUST INCLUDE: 22,000 or 22000","₹22,000 per semester, compulsory for all hostel residents.",,
+56,qwen2.5:3b,strict,0.0,0,a060,multi_fact,True,"With the need-based scholarship, how much B.Tech tuition do I pay per semester?","MUST INCLUDE: 90,000 or 90000","With the need-based scholarship, you pay 75% of the B.Tech tuition fee, which is ₹1,20,000 per semester.",,
+57,gemma2:2b,lenient,0.0,0,u016,near_miss,False,What was the highest package for ECE students in 2025-26?,NOT ANSWERABLE from the fact sheet,The highest package for ECE students in the 2025-26 placement season was **₹42 lakh per year**.,,
+58,qwen2.5:3b,lenient,0.0,0,u033,near_miss,False,How much does it cost to use the swimming pool?,NOT ANSWERABLE from the fact sheet,"The swimming pool at Northbridge Institute of Technology is open from 6:00 AM to 8:00 AM and 5:00 PM to 7:00 PM, but the cost to use the pool is not specified in the provided fact sheet. The fact sheet does mention that the campus has a 25-metre swimming pool, but it does not include any information about fees or charges for using the pool.",,
+59,llama3.2:3b,lenient,0.0,0,a052,multi_fact,True,How many beds are there across the boys' hostels?,"MUST INCLUDE: 1,100 or 1100","There are a total of 600 beds in the boys' hostels. 
+
+- Aravali boys' hostel has 600 beds.
+- Nilgiri boys' hostel has 500 beds.",,
+60,gemma2:2b,strict,0.0,0,u049,personal,False,What is my current attendance percentage?,NOT ANSWERABLE from the fact sheet,I don't know based on the available information.,,
