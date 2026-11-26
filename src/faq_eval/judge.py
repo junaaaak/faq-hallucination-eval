@@ -21,8 +21,10 @@ compete for GPU memory.
 
 from __future__ import annotations
 
+import hashlib
 import json
 from enum import Enum
+from pathlib import Path
 from typing import Any
 
 from pydantic import BaseModel, ValidationError
@@ -202,7 +204,42 @@ class Judge:
         raise ValueError(f"judge returned invalid output for {question.id}: {last_error}")
 
 
-def final_grade(question: Question, answer: str, fact_sheet: str, judge: Judge | None) -> Grade:
+JUDGE_PROMPT_VERSION = hashlib.sha1((_SYSTEM + _USER_ANSWERABLE + _USER_UNANSWERABLE).encode()).hexdigest()[:10]
+
+
+class CachedJudge:
+    """Wraps a Judge and appends each verdict to a JSONL file as soon as it's made."""
+
+    def __init__(self, judge: Judge, path: Path, read: bool = True):
+        self.inner = judge
+        self.model = judge.model
+        self.path = path
+        self.calls = 0
+        self._cache: dict[tuple, JudgeOutput] = {}
+        if read and path.exists():
+            with path.open(encoding="utf-8") as f:
+                for line in f:
+                    if line.strip():
+                        row = json.loads(line)
+                        key = (row["model"], row["prompt_version"], row["sheet"], row["question_id"], row["answer"])
+                        self._cache[key] = JudgeOutput.model_validate(row["output"])
+
+    def judge(self, question: Question, answer: str, fact_sheet: str) -> JudgeOutput:
+        sheet = hashlib.sha1(fact_sheet.encode()).hexdigest()[:10]
+        key = (self.model, JUDGE_PROMPT_VERSION, sheet, question.id, answer)
+        if key in self._cache:
+            return self._cache[key]
+        out = self.inner.judge(question, answer, fact_sheet)
+        self.calls += 1
+        self._cache[key] = out
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        with self.path.open("a", encoding="utf-8") as f:
+            row = dict(zip(("model", "prompt_version", "sheet", "question_id", "answer"), key))
+            f.write(json.dumps({**row, "output": out.model_dump()}, ensure_ascii=False) + "\n")
+        return out
+
+
+def final_grade(question: Question, answer: str, fact_sheet: str, judge: Judge | CachedJudge | None) -> Grade:
     """Rule grade, overridden by the judge where the rules aren't confident."""
     rule = grade(question, answer)
     if judge is None or not needs_judge(question, rule):

@@ -144,6 +144,7 @@ class FakeBot:
 def tmp_results(tmp_path, monkeypatch):
     monkeypatch.setattr(runner, "RUNS_DIR", tmp_path / "runs")
     monkeypatch.setattr(runner, "GRADED_DIR", tmp_path / "graded")
+    monkeypatch.setattr(runner, "CACHE_DIR", tmp_path / "cache")
     monkeypatch.setattr(labels, "LABELS_DIR", tmp_path / "labels")
     FakeBot.asked = 0
     return tmp_path
@@ -156,6 +157,35 @@ def test_run_resumes_without_repeating(tmp_results):
     runner.run("t", ["m"], ["strict", "lenient"], [0.0, 0.7], 1, questions=qs, bot_factory=FakeBot)
     assert FakeBot.asked == 8  # only the new temperature was asked
     assert len(runner.read_jsonl(runner.run_path("t"), runner.RunRecord)) == 8
+
+
+class HallucinatingBot(FakeBot):
+    def ask(self, question):
+        FakeBot.asked += 1
+        return BotResponse(answer="Exam-week hours are 7 AM to midnight.", latency_s=0.0)
+
+
+def test_judge_verdicts_are_cached_and_resumable(tmp_results):
+    runner.run("t", ["m"], ["lenient"], [0.0], 1, questions=[Q["u013"], Q["u021"]], bot_factory=HallucinatingBot)
+    verdict = judge_json(claims=[("Exam-week hours are 7 AM to midnight.", False)])
+
+    client = FakeJudgeClient([verdict, verdict])
+    runner.grade_run("t", judge=Judge(model="j", client=client))
+    assert client.calls == 2
+    assert runner.judge_cache_path("t").exists()
+
+    again = FakeJudgeClient([])
+    runner.grade_run("t", judge=Judge(model="j", client=again))
+    assert again.calls == 0  # all verdicts came from the cache
+
+    other_model = FakeJudgeClient([verdict, verdict])
+    runner.grade_run("t", judge=Judge(model="other", client=other_model))
+    assert other_model.calls == 2  # cache is per judge model
+
+    forced = FakeJudgeClient([verdict, verdict])
+    runner.grade_run("t", judge=Judge(model="j", client=forced), rejudge=True)
+    assert forced.calls == 2
+    assert {g.label for g in runner.load_graded("t")} == {Label.HALLUCINATION}
 
 
 def test_grade_run_and_agreement(tmp_results):

@@ -17,11 +17,12 @@ from pydantic import BaseModel
 from faq_eval.bot import BotConfig, FAQBot
 from faq_eval.dataset import Question, load_fact_sheet, load_questions
 from faq_eval.grader import Label, grade
-from faq_eval.judge import Judge, final_grade
+from faq_eval.judge import CachedJudge, Judge, final_grade
 
 RESULTS_DIR = Path(__file__).resolve().parents[2] / "results"
 RUNS_DIR = RESULTS_DIR / "runs"
 GRADED_DIR = RESULTS_DIR / "graded"
+CACHE_DIR = RESULTS_DIR / "cache"  # gitignored
 
 
 class RunRecord(BaseModel):
@@ -112,38 +113,43 @@ def run(
     return path
 
 
+def judge_cache_path(name: str) -> Path:
+    return CACHE_DIR / f"{name}.judge.jsonl"
+
+
 def grade_run(
     name: str,
     judge: Judge | None = None,
     on_progress: Callable[[int, int, GradedRecord], None] | None = None,
     rejudge: bool = False,
 ) -> Path:
-    """Grade every answer in a run, reusing earlier judge verdicts for unchanged answers unless rejudge is set."""
+    """Grade every answer in a run.
+
+    Judge verdicts are appended to a cache file as they're made, so an interrupted grading run resumes
+    where it stopped. The cache is keyed on the judge model, judge prompt and fact sheet, so changing
+    any of them re-judges automatically; rejudge ignores the cache entirely.
+    """
     questions = {q.id: q for q in load_questions()}
     fact_sheet = load_fact_sheet()
     records: list[RunRecord] = read_jsonl(run_path(name), RunRecord)
     if not records:
         raise FileNotFoundError(f"no answers in {run_path(name)}")
-
-    out_path = graded_path(name)
-    previous = {(g.key(), g.answer): g for g in read_jsonl(out_path, GradedRecord) if g.method == "judge"}
+    if judge is not None:
+        judge = CachedJudge(judge, judge_cache_path(name), read=not rejudge)
 
     graded: list[GradedRecord] = []
     for i, rec in enumerate(records, start=1):
         q = questions[rec.question_id]
-        cached = previous.get((rec.key(), rec.answer)) if judge and not rejudge else None
-        if cached:
-            g = cached
-        else:
-            rule = grade(q, rec.answer)
-            final = final_grade(q, rec.answer, fact_sheet, judge=judge) if judge else rule
-            g = GradedRecord(
-                **rec.model_dump(), rule_label=rule.label, label=final.label, method=final.method, reason=final.reason
-            )
+        rule = grade(q, rec.answer)
+        final = final_grade(q, rec.answer, fact_sheet, judge=judge) if judge else rule
+        g = GradedRecord(
+            **rec.model_dump(), rule_label=rule.label, label=final.label, method=final.method, reason=final.reason
+        )
         graded.append(g)
         if on_progress:
             on_progress(i, len(records), g)
 
+    out_path = graded_path(name)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     with out_path.open("w", encoding="utf-8") as f:
         for g in graded:
