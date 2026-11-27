@@ -17,3 +17,7 @@ PLAN.md
 .idea/
 .DS_Store
 Thumbs.db
+
+# Local tooling
+.claude/
+.streamlit/secrets.toml

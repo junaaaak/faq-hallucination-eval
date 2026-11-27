@@ -182,3 +182,15 @@ def report_cmd(name: str = typer.Option(..., help="Graded run to report on.")) -
 
 if __name__ == "__main__":
     app()
+
+
+@app.command("demo")
+def demo_cmd(port: int = typer.Option(8501, help="Port for the Streamlit server.")) -> None:
+    """Start the Streamlit demo (live bot plus results explorer)."""
+    import subprocess
+    import sys
+    from pathlib import Path
+
+    app_path = Path(__file__).with_name("app.py")
+    raise typer.Exit(subprocess.call([sys.executable, "-m", "streamlit", "run", str(app_path),
+                                      "--server.port", str(port), "--server.headless", "true"]))
