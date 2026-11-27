@@ -131,7 +131,11 @@ compares it with the grader.
 
 ## Project layout
 
+The whole pipeline, from fact sheet to findings, is drawn in
+[docs/project-flow.excalidraw](docs/project-flow.excalidraw) (open it at [excalidraw.com](https://excalidraw.com)).
+
 ```
+docs/              project flow diagram (Excalidraw)
 data/              fact sheet and question set
 src/faq_eval/      bot, rule grader, judge, runner, metrics, report, demo app, CLI
 tests/             unit tests (no Ollama needed)
