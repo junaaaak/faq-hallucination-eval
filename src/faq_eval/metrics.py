@@ -174,3 +174,34 @@ def consistency_metrics(records: Iterable[GradedRecord]) -> list[ConsistencyMetr
             any_error_answerable=Rate(k=sum(any(r.label != Label.CORRECT for r in v) for v in ans), n=len(ans)),
         ))
     return sorted(out, key=lambda c: (c.model, c.prompt, c.temperature))
+
+
+class TrendTest(BaseModel):
+    """Logistic regression of one outcome on temperature within a (model, prompt) pair."""
+    model: str
+    prompt: str
+    measure: str
+    slope: float  # change in log-odds per 1.0 of temperature
+    p_value: float
+    n: int
+
+
+def trend_test(records: Iterable[GradedRecord], model: str, prompt: str, label: Label) -> TrendTest | None:
+    """Does `label` get more or less likely as temperature rises? Uses the answerable questions for
+    CORRECT and the unanswerable ones otherwise. Standard errors are clustered by question, since
+    samples of the same question are correlated. None if the outcome never or always happens."""
+    import numpy as np
+    import statsmodels.api as sm
+
+    answerable = label == Label.CORRECT
+    rs = [r for r in records if r.model == model and r.prompt == prompt and r.answerable == answerable]
+    y = np.array([r.label == label for r in rs], dtype=float)
+    temps = {r.temperature for r in rs}
+    if len(temps) < 2 or y.min() == y.max():
+        return None
+    x = sm.add_constant(np.array([r.temperature for r in rs]))
+    ids = sorted({r.question_id for r in rs})
+    groups = np.array([ids.index(r.question_id) for r in rs])
+    fit = sm.GLM(y, x, family=sm.families.Binomial()).fit(cov_type="cluster", cov_kwds={"groups": groups})
+    return TrendTest(model=model, prompt=prompt, measure=label.value, slope=float(fit.params[1]),
+                     p_value=float(fit.pvalues[1]), n=len(rs))

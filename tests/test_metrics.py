@@ -124,3 +124,35 @@ def test_build_report_with_temperatures(tmp_path, monkeypatch):
     assert "| t=0 | t=1 |" in text
     assert "hallucinated in at least one sample" in text
     assert (tmp_path / "reports" / "t" / "temperature.png").stat().st_size > 0
+
+
+def test_trend_test_detects_a_rising_rate():
+    from faq_eval.metrics import trend_test
+
+    rs = []
+    for t, k in ((0.0, 2), (0.5, 10), (1.0, 18)):
+        for i in range(20):
+            label = Label.HALLUCINATION if i < k else Label.CORRECT_REFUSAL
+            rs.append(rec("m", "lenient", f"u{i}", False, label, "near_miss", temperature=t))
+    t = trend_test(rs, "m", "lenient", Label.HALLUCINATION)
+    assert t.slope > 0 and t.p_value < 0.01 and t.n == 60
+    assert trend_test(rs, "m", "lenient", Label.CORRECT) is None  # no answerable questions
+
+
+def test_build_report_includes_run_notes(tmp_path, monkeypatch):
+    from faq_eval import labels, report, runner
+
+    monkeypatch.setattr(runner, "GRADED_DIR", tmp_path / "graded")
+    monkeypatch.setattr(runner, "RUNS_DIR", tmp_path / "runs")
+    monkeypatch.setattr(report, "REPORTS_DIR", tmp_path / "reports")
+    monkeypatch.setattr(labels, "LABELS_DIR", tmp_path / "labels")
+    runner.GRADED_DIR.mkdir()
+    runner.RUNS_DIR.mkdir()
+    (runner.RUNS_DIR / "t.notes.md").write_text("- Ollama was updated mid-run.", encoding="utf-8")
+    hot = [r.model_copy(update={"temperature": 1.0, "sample": s}) for r in RECORDS for s in range(3)]
+    with (runner.GRADED_DIR / "t.jsonl").open("w", encoding="utf-8") as f:
+        for r in RECORDS + hot:
+            f.write(r.model_dump_json() + "\n")
+    text = report.build_report("t").read_text(encoding="utf-8")
+    assert "## Run notes" in text and "Ollama was updated mid-run." in text
+    assert "Trend test" in text

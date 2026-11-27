@@ -45,6 +45,22 @@ Regenerate it with:
 faq-eval report --name main
 ```
 
+The temperature sweep (temperatures 0.3, 0.7, 1.0 and 1.3, three samples per question, 9,360 answers in all)
+is in [results/reports/sweep.md](results/reports/sweep.md). In short: over this range, temperature made no
+detectable difference to hallucination or accuracy (none of 12 per-setting trend tests reached p < 0.05).
+The system prompt mattered far more. At higher temperatures, though, the same question can get different
+answers. With the lenient prompt, 33–58% of unanswerable questions were hallucinated in at least one of
+three samples, against a per-answer rate of 19–40%.
+
+The temperature-0 answers in the sweep were copied from the main run (`results/runs/sweep.notes.md`).
+
+```bash
+faq-eval run --name sweep --models llama3.2:3b,qwen2.5:3b,gemma2:2b --prompts strict,lenient \
+  --temperatures 0.3,0.7,1.0,1.3 --samples 3
+faq-eval grade --name sweep
+faq-eval report --name sweep
+```
+
 ## Status
 
-Work in progress: temperature sweep and Streamlit demo still to come.
+Work in progress: Streamlit demo still to come.

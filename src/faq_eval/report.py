@@ -13,7 +13,9 @@ from faq_eval.metrics import (
     consistency_metrics,
     paired_test,
     setting_metrics,
+    trend_test,
 )
+from faq_eval import runner
 from faq_eval.runner import RESULTS_DIR, GradedRecord, load_graded
 
 REPORTS_DIR = RESULTS_DIR / "reports"
@@ -364,6 +366,24 @@ def build_report(name: str) -> Path:
                       + " | ".join(getattr(cons[k], attr).fmt() if k in cons else "n/a" for k in ks) + " |")
                 w("")
         w("Pooling samples treats them as independent, so intervals at temperatures above 0 are somewhat too narrow.\n")
+        trends = [(m, trend_test(graded_all, m.model, m.prompt, Label.HALLUCINATION),
+                   trend_test(graded_all, m.model, m.prompt, Label.CORRECT)) for m in ms]
+        w("Trend test: logistic regression of each outcome on temperature, per model and prompt, with standard "
+          "errors clustered by question. The slope is the change in log-odds from temperature 0 to 1; "
+          "positive means the outcome gets more likely as temperature rises.\n")
+        w("| Model | Prompt | Hallucination slope | p | Accuracy slope | p |")
+        w("|---|---|---|---|---|---|")
+
+        def cell(t):
+            return f"{t.slope:+.2f} | {t.p_value:.2g}" if t else "n/a | n/a"
+
+        for m, h, c in trends:
+            w(f"| {m.model} | {m.prompt} | {cell(h)} | {cell(c)} |")
+        w("")
+        ps = [t.p_value for _, h, c in trends for t in (h, c) if t]
+        if ps:
+            w(f"{sum(p < 0.05 for p in ps)} of {len(ps)} trends have p < 0.05, before any correction for "
+              f"running {len(ps)} tests.\n")
 
     w("## By question type" + (f" (temperature {t0:g})" if len(temps) > 1 else "") + "\n")
     w(f"![Hallucination by category]({name}/categories.png)\n")
@@ -411,6 +431,11 @@ def build_report(name: str) -> Path:
     else:
         w("The same grader was checked against 60 hand labels from the main run; see `results/agreement/` "
           "and `results/reports/main.md`. Answers at higher temperatures were not hand-labelled.\n")
+
+    notes = runner.RUNS_DIR / f"{name}.notes.md"
+    if notes.exists():
+        w("## Run notes\n")
+        w(notes.read_text(encoding="utf-8").strip() + "\n")
 
     path = REPORTS_DIR / f"{name}.md"
     path.write_text("\n".join(L), encoding="utf-8")
