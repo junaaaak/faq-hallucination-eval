@@ -1,0 +1,3 @@
+- The temperature-0 answers are copied from the `main` run; temperatures 0.3 to 1.3 were generated for this sweep.
+- The run was interrupted once (laptop shut down) and resumed without repeating any answer. Ollama updated itself from 0.40.17 to 0.40.18 during the break, so roughly the first 650 new answers came from the older version. Model weights were unchanged.
+- The judge's cache is per run, so the temperature-0 answers were judged again here. 2 of 720 labels differ from `main` (llama lenient u058 went from hallucination to correct refusal, gemma lenient u049 the other way), so the judge itself is slightly non-deterministic. That is why the temperature-0 numbers here can differ from `main.md` by a point or two.
