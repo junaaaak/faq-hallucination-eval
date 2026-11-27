@@ -7,6 +7,9 @@ asked 120 questions. Half can be answered from the sheet; half can't. Because th
 answer the sheet doesn't support is a hallucination by definition, and for the unanswerable half the
 right reply is "I don't know".
 
+📝 **Write-up:** [my FAQ bot invented its own recruiters](https://vishaljunakdas.substack.com/p/my-faq-bot-invented-its-own-recruiters),
+a week-long build journal on Substack covering how the eval was built, what went wrong, and what the numbers show.
+
 ![Accuracy vs refusal](results/reports/main/tradeoff.png)
 
 ## What is measured
